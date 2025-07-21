@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+
+class AnimatedSearchBar extends StatelessWidget {
+  final VoidCallback onSearchIconPressed;
+  final Function(String) onSubmitted;
+
+  const AnimatedSearchBar({
+    super.key,
+    required this.onSearchIconPressed,
+    required this.onSubmitted,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 300),
+      child: Container(
+        height: 40,
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                autofocus: true,
+                onSubmitted: onSubmitted,
+                textAlign: TextAlign.start, // ← align text to the left
+                textAlignVertical:
+                    TextAlignVertical.center, // ← vertical centering
+                decoration: InputDecoration(
+                  hintText: 'Search Product...',
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10,
+                  ), // ← add vertical padding
+                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: onSearchIconPressed,
+              splashRadius: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
