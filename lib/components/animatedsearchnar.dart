@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AnimatedSearchBar extends StatelessWidget {
-  final VoidCallback onSearchIconPressed;
   final Function(String) onSubmitted;
 
   const AnimatedSearchBar({
     super.key,
-    required this.onSearchIconPressed,
     required this.onSubmitted,
   });
 
@@ -31,6 +29,7 @@ class AnimatedSearchBar extends StatelessWidget {
                 textAlignVertical:
                     TextAlignVertical.center, // ← vertical centering
                 decoration: InputDecoration(
+                  icon: Icon(Icons.search, color: Colors.grey),
                   hintText: 'Search Product...',
                   border: InputBorder.none,
                   isDense: true,
@@ -39,11 +38,6 @@ class AnimatedSearchBar extends StatelessWidget {
                   ), // ← add vertical padding
                 ),
               ),
-            ),
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: onSearchIconPressed,
-              splashRadius: 20,
             ),
           ],
         ),

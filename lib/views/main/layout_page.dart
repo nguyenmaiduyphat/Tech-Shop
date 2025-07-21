@@ -1,8 +1,12 @@
+import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tech_fun/components/DrawerMenuItem.dart';
 import 'package:tech_fun/components/animatedsearchnar.dart';
 import 'package:tech_fun/components/user_avatar.dart';
+import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
+import 'package:tech_fun/views/bottom_view/my_store_page.dart';
+import 'package:tech_fun/views/bottom_view/post_page.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({super.key});
@@ -13,9 +17,19 @@ class LayoutPage extends StatefulWidget {
 
 class _LayoutPageState extends State<LayoutPage> {
   bool loggedIn = false;
+  late Color currentColor;
   final String userName = "John Doe";
   final String userRank = "Gold";
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _pageController = PageController(initialPage: 0);
+
+  /// Controller to handle bottom nav bar and also handles initial page
+  final NotchBottomBarController _controller = NotchBottomBarController(
+    index: 0,
+  );
+
+  int maxCount = 5;
+
   bool showSearchBar = false;
 
   void _closeSearchBar([String? value]) {
@@ -23,6 +37,27 @@ class _LayoutPageState extends State<LayoutPage> {
       showSearchBar = false;
     });
   }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    currentColor = Colors.white;
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+
+    super.dispose();
+  }
+
+  /// widget list
+  final List<Widget> bottomBarPages = [
+    PostPage(),
+    CommunityChatPage(),
+    MyStorePage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -48,52 +83,69 @@ class _LayoutPageState extends State<LayoutPage> {
                 SizedBox(width: 8),
 
                 // Centered logo or search
-                Expanded(
-                  child: showSearchBar
-                      ? Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: AnimatedSearchBar(
-                            onSubmitted: _closeSearchBar,
-                            onSearchIconPressed: _closeSearchBar,
-                          ),
-                        )
-                      : _LogoText(),
-                ),
-
-                // Search or login
-                IconButton(
-                  icon: Icon(Icons.search, color: Colors.white),
-                  onPressed: () {
-                    setState(() {
-                      showSearchBar = !showSearchBar;
-                    });
-                  },
-                ),
+                Expanded(child: Center(child: _LogoText())),
               ],
             ),
           ),
 
           // Body content
           Expanded(
-            child: Center(
-              child: Text(
-                'Display other interfaces here',
-                style: TextStyle(fontSize: 22, color: Colors.grey[700]),
-              ),
-            ),
-          ),
-
-          // Footer
-          Container(
-            height: 50,
-            color: Colors.blueGrey[900],
-            alignment: Alignment.center,
-            child: Text(
-              "@$currentYear CopyRight Tech Fun",
-              style: TextStyle(color: Colors.white70, fontSize: 16),
+            child: PageView(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(), // disables swipe
+              children: bottomBarPages,
             ),
           ),
         ],
+      ),
+
+      // Footer
+      bottomNavigationBar: AnimatedNotchBottomBar(
+        notchBottomBarController: _controller,
+        color: currentColor,
+        showLabel: false,
+        shadowElevation: 10,
+        kIconSize: 28.0, // <- cái bạn thiếu
+        kBottomRadius: 28.0,
+        bottomBarWidth: MediaQuery.of(context).size.width * 0.95,
+        bottomBarItems: const [
+          BottomBarItem(
+            inActiveItem: Icon(Icons.wifi_off_outlined, color: Colors.grey),
+            activeItem: Icon(Icons.podcasts, color: Colors.blue),
+            itemLabel: 'Posts',
+          ),
+          BottomBarItem(
+            inActiveItem: Icon(
+              Icons.chat_bubble_outline_outlined,
+              color: Colors.grey,
+            ),
+            activeItem: Icon(Icons.chat, color: Colors.orange),
+            itemLabel: 'Community Chat',
+          ),
+          BottomBarItem(
+            inActiveItem: Icon(Icons.storefront_outlined, color: Colors.grey),
+            activeItem: Icon(Icons.store, color: Colors.green),
+            itemLabel: 'My Store',
+          ),
+        ],
+        onTap: (index) {
+          _controller.index = index;
+          _pageController.jumpToPage(index);
+
+          setState(() {
+            switch (_controller.index) {
+              case 0:
+                currentColor = Colors.white;
+                break;
+              case 1:
+                currentColor = Colors.teal;
+                break;
+              case 2:
+                currentColor = Colors.brown;
+                break;
+            }
+          });
+        },
       ),
     );
   }
@@ -145,38 +197,51 @@ class _LayoutPageState extends State<LayoutPage> {
               // Search Input
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Container(
-                  height: 36,
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      border: InputBorder.none,
-                      icon: Icon(Icons.search, size: 20),
-                    ),
-                  ),
+                child: AnimatedSearchBar(
+                  onSubmitted: (String) {
+                    Navigator.pop(context);
+                  },
                 ),
               ),
 
               Spacer(),
 
-              // Login or Avatar
+              // Login/Register or Avatar
               Padding(
                 padding: EdgeInsets.all(16),
                 child: loggedIn
-                    ? UserAvatar(name: userName, rank: userRank)
-                    : ElevatedButton(
-                        onPressed: () {
+                    ? UserAvatar(
+                        name: userName,
+                        rank: userRank,
+                        onTap: () {
                           setState(() {
-                            loggedIn = true;
+                            loggedIn = false;
                             Navigator.pop(context);
                           });
                         },
-                        child: Text("Login"),
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                loggedIn = true;
+                                Navigator.pop(context);
+                              });
+                            },
+                            child: Text("Login"),
+                          ),
+                          SizedBox(height: 8),
+                          OutlinedButton(
+                            onPressed: () {
+                              setState(() {
+                                Navigator.pop(context);
+                              });
+                            },
+                            child: Text("Register"),
+                          ),
+                        ],
                       ),
               ),
             ],

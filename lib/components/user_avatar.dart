@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 class UserAvatar extends StatelessWidget {
   final String name;
   final String rank;
-  const UserAvatar({super.key, required this.name, required this.rank});
+  final VoidCallback onTap;
+
+  const UserAvatar({
+    super.key,
+    required this.name,
+    required this.rank,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,19 +24,25 @@ class UserAvatar extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              name,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            Text(rank, style: TextStyle(color: Colors.white70, fontSize: 12)),
-          ],
+              Text(rank, style: TextStyle(color: Colors.white70, fontSize: 12)),
+            ],
+          ),
+        ),
+        IconButton(
+          onPressed: onTap,
+          icon: Icon(Icons.logout, color: Colors.red),
         ),
       ],
     );
