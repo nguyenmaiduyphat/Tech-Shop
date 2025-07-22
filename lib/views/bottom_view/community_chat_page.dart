@@ -82,9 +82,7 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
       userName: "You",
       userAvatarUrl: "assets/user/user1.jpg",
       text: text,
-      image: _selectedImage == null
-          ? ""
-          : "assets/product/${_selectedImage?.path.split("\\").last}",
+      image: "",
       sentAt: DateTime.now().toString().split('.')[0],
     );
 
@@ -103,37 +101,16 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
     });
   }
 
-  Future<void> pickAndCopyImageToProductFolder() async {
-    // Chọn ảnh
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
+  File? _imageFile;
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery, // or ImageSource.camera
     );
 
-    if (result != null && result.files.single.path != null) {
-      File selectedFile = File(result.files.single.path!);
-
-      // Lấy thư mục nội bộ của app
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String productDirPath = path.join(appDocDir.path, 'product');
-
-      // Tạo thư mục nếu chưa có
-      Directory productDir = Directory(productDirPath);
-      if (!productDir.existsSync()) {
-        productDir.createSync(recursive: true);
-      }
-
-      // Đường dẫn mới cho ảnh
-      String newFilePath = path.join(
-        productDirPath,
-        path.basename(selectedFile.path),
-      );
-
-      // Copy ảnh vào thư mục nội bộ
-      await selectedFile.copy(newFilePath);
-
-      print('Image copied to: $newFilePath');
-    } else {
-      print('No image selected');
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
     }
   }
 
@@ -257,7 +234,7 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
               children: [
                 IconButton(
                   icon: Icon(Icons.image, color: Colors.teal),
-                  onPressed: pickAndCopyImageToProductFolder,
+                  onPressed: _pickImage,
                 ),
                 Expanded(
                   child: TextField(
