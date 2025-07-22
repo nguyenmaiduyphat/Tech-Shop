@@ -1,13 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class ReactionButton extends StatefulWidget {
+  final String currentIcon;
   final int emojiTotal;
   final ValueChanged<int> onEmojiTotalChanged;
+  final ValueChanged<String> onEmojiIconChanged;
 
   const ReactionButton({
     super.key,
     required this.emojiTotal,
     required this.onEmojiTotalChanged,
+    required this.currentIcon,
+    required this.onEmojiIconChanged,
   });
 
   @override
@@ -15,10 +21,10 @@ class ReactionButton extends StatefulWidget {
 }
 
 class _ReactionButtonState extends State<ReactionButton> {
-  late int emojiTotal;
+  late int emojiTotal = widget.emojiTotal;
   OverlayEntry? _overlayEntry;
   String defaultIcon = "⚫";
-  late String currentIcon;
+  late String currentIcon = defaultIcon;
   bool _isHovering = false;
   final LayerLink _layerLink = LayerLink();
 
@@ -27,7 +33,7 @@ class _ReactionButtonState extends State<ReactionButton> {
   void initState() {
     super.initState();
 
-    currentIcon = defaultIcon;
+    currentIcon = widget.currentIcon;
     emojiTotal = widget.emojiTotal;
   }
 
@@ -88,10 +94,12 @@ class _ReactionButtonState extends State<ReactionButton> {
                               child: GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    if (currentIcon == defaultIcon)
+                                    if (currentIcon == defaultIcon) {
                                       emojiTotal++;
+                                    }
                                     currentIcon = emoji;
                                     widget.onEmojiTotalChanged(emojiTotal);
+                                    widget.onEmojiIconChanged(currentIcon);
                                   });
                                   _removeOverlay();
                                 },
@@ -124,12 +132,18 @@ class _ReactionButtonState extends State<ReactionButton> {
     );
   }
 
+  Timer? _hoverTimer;
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) {
+      onHover: (_) {
         _isHovering = true;
-        _showOverlay();
+        _hoverTimer = Timer(Duration(seconds: 1), () {
+          if (_isHovering) {
+            _showOverlay();
+          }
+        });
       },
       onExit: (_) {
         _isHovering = false;
@@ -142,9 +156,12 @@ class _ReactionButtonState extends State<ReactionButton> {
         child: GestureDetector(
           onTap: () {
             setState(() {
-              if (currentIcon != defaultIcon) emojiTotal--;
+              if (currentIcon != defaultIcon) {
+                emojiTotal--;
+              }
               currentIcon = defaultIcon;
               widget.onEmojiTotalChanged(emojiTotal);
+              widget.onEmojiIconChanged(currentIcon);
             });
           },
           child: AnimatedSwitcher(
