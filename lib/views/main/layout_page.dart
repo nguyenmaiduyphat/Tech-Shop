@@ -184,7 +184,11 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
         ],
         onTap: (index) {
           _controller.index = index;
-          _pageController.jumpToPage(index);
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+          );
 
           setState(() {
             switch (_controller.index) {
