@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class CommentSection extends StatelessWidget {
@@ -18,27 +17,39 @@ class CommentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(4),
+    return Column(
+      children: [
+        // Header
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF121C3D), // Deep tech blue
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
             ),
           ),
-          const Text(
+          alignment: Alignment.center,
+          child: const Text(
             "Comments",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.white,
+            ),
           ),
-          const SizedBox(height: 5),
-          const Divider(height: 8, color: Colors.white54),
-          const SizedBox(height: 5),
-          Expanded(
+        ),
+
+        // Divider line
+        Container(height: 1, width: double.infinity, color: Colors.grey[800]),
+
+        // List of comments
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            color: const Color(0xFF1C2331), // Slightly lighter tech color
             child: ValueListenableBuilder<List<String>>(
               valueListenable: commentsNotifier,
               builder: (context, comments, _) {
@@ -57,8 +68,14 @@ class CommentSection extends StatelessWidget {
                         leading: const CircleAvatar(
                           backgroundImage: AssetImage("assets/user/user1.jpg"),
                         ),
-                        title: Text("User ${index + 1}"),
-                        subtitle: Text(comments[index]),
+                        title: Text(
+                          "User ${index + 1}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        subtitle: Text(
+                          comments[index],
+                          style: const TextStyle(color: Colors.white70),
+                        ),
                       );
                     },
                   ),
@@ -66,26 +83,47 @@ class CommentSection extends StatelessWidget {
               },
             ),
           ),
-          Row(
+        ),
+
+        // Comment input
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2E3A59), // Input area background
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            ),
+          ),
+          child: Row(
             children: [
               Expanded(
                 child: TextField(
                   controller: commentController,
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: "Write a comment...",
+                    hintStyle: const TextStyle(color: Colors.white54),
+                    filled: true,
+                    fillColor: const Color(0xFF3A4765),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
                   onSubmitted: (_) => onSubmit(),
                 ),
               ),
-              IconButton(icon: const Icon(Icons.send), onPressed: onSubmit),
+              IconButton(
+                icon: const Icon(Icons.send, color: Colors.white),
+                onPressed: onSubmit,
+              ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -184,14 +184,28 @@ class _PostCardState extends State<PostCard> {
 
   void _showPostOptions(BuildContext context) async {
     final RenderBox button = context.findRenderObject() as RenderBox;
+    final Size screenSize = MediaQuery.of(context).size;
     final Offset offset = button.localToGlobal(Offset.zero);
+
+    // Tính toán vị trí xuất hiện phù hợp để không sát mép phải
+    const double menuWidth = 160; // Giả định chiều rộng menu
+    double left = offset.dx;
+    double right = screenSize.width - left - menuWidth;
+
+    if (right < 16) {
+      // Nếu sát mép phải thì dịch sang trái
+      left = screenSize.width - menuWidth - 16;
+    }
 
     final result = await showMenu<String>(
       context: context,
-      position: RelativeRect.fromLTRB(offset.dx - 100, offset.dy + 40, 0, 0),
+      position: RelativeRect.fromLTRB(left, offset.dy + 40, 30, 0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: const Color(0xFF1C1C1E),
+      elevation: 12,
       items: [
-        const PopupMenuItem(value: 'remove', child: Text('Remove')),
-        const PopupMenuItem(value: 'report', child: Text('Report')),
+        _buildHoverMenuItem(value: 'remove', label: '🗑️ Remove'),
+        _buildHoverMenuItem(value: 'report', label: '🚩 Report'),
       ],
     );
 
@@ -200,6 +214,53 @@ class _PostCardState extends State<PostCard> {
     } else if (result == 'report') {
       _showReportForm();
     }
+  }
+
+  PopupMenuItem<String> _buildHoverMenuItem({
+    required String value,
+    required String label,
+  }) {
+    bool isHovered = false;
+
+    return PopupMenuItem<String>(
+      value: value,
+      padding: EdgeInsets.zero,
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          return MouseRegion(
+            onEnter: (_) => setState(() => isHovered = true),
+            onExit: (_) => setState(() => isHovered = false),
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop(value); // Trả về value khi click
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: isHovered
+                        ? Colors
+                              .orange // Màu tech xanh dương hover
+                        : Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   void _showReportForm() {
@@ -317,59 +378,67 @@ class _PostCardState extends State<PostCard> {
   void _showShareOptions() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: const Color(0xFF1F1F2E), // Dark techy background
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Wrap(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.facebook, color: Colors.blue),
-              title: Text("Facebook"),
-              onTap: () {
-                Navigator.pop(context);
-                _shareToFacebook();
-              },
+            _buildShareTile(
+              icon: FontAwesomeIcons.facebook,
+              label: "Facebook",
+              color: Colors.blueAccent,
+              onTap: _shareToFacebook,
             ),
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.google, color: Colors.red),
-              title: Text("Gmail"),
-              onTap: () {
-                Navigator.pop(context);
-                _shareToGmail();
-              },
+            _buildShareTile(
+              icon: FontAwesomeIcons.google,
+              label: "Gmail",
+              color: Colors.redAccent,
+              onTap: _shareToGmail,
             ),
-            ListTile(
-              leading: FaIcon(
-                FontAwesomeIcons.microsoft,
-                color: Colors.blueGrey,
-              ),
-              title: Text("Outlook"),
-              onTap: () {
-                Navigator.pop(context);
-                _shareToOutlook();
-              },
+            _buildShareTile(
+              icon: FontAwesomeIcons.microsoft,
+              label: "Outlook",
+              color: Colors.teal,
+              onTap: _shareToOutlook,
             ),
-            ListTile(
-              leading: const Icon(Icons.chat_bubble, color: Colors.lightBlue),
-              title: Text("Zalo"),
-              onTap: () {
-                Navigator.pop(context);
-                _shareToZalo();
-              },
+            _buildShareTile(
+              icon: Icons.chat_bubble,
+              label: "Zalo",
+              color: Colors.lightBlue,
+              onTap: _shareToZalo,
             ),
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.teamspeak, color: Colors.purple),
-              title: Text("Microsoft Teams"),
-              onTap: () {
-                Navigator.pop(context);
-                _shareToTeams();
-              },
+            _buildShareTile(
+              icon: FontAwesomeIcons.teamspeak,
+              label: "Microsoft Teams",
+              color: Colors.deepPurpleAccent,
+              onTap: _shareToTeams,
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildShareTile({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: FaIcon(icon, color: color),
+      title: Text(
+        label,
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        onTap();
+      },
     );
   }
 

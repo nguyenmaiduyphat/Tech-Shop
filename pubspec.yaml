@@ -84,6 +84,7 @@ flutter:
     - assets/product/product8.jpg
     - assets/product/product9.jpg
     - assets/product/product10.jpg
+    - assets/product/image.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

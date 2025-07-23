@@ -15,7 +15,7 @@ class LayoutPage extends StatefulWidget {
   State<LayoutPage> createState() => _LayoutPageState();
 }
 
-class _LayoutPageState extends State<LayoutPage> {
+class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
   bool loggedIn = false;
   late Color currentColor;
   final String userName = "John Doe";
@@ -38,17 +38,42 @@ class _LayoutPageState extends State<LayoutPage> {
     });
   }
 
+  late AnimationController _bgController;
+  late Animation<Color?> _color1;
+  late Animation<Color?> _color2;
+  late Animation<Color?> _color3;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _bgController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat(reverse: true);
+
+    _color1 = ColorTween(
+      begin: const Color(0xFF000000), // Pure Black
+      end: const Color(0xFFB0BEC5), // Blue Grey 200 (cool grey tone)
+    ).animate(_bgController);
+
+    _color2 = ColorTween(
+      begin: const Color(0xFF2196F3), // Material Blue 500
+      end: const Color(0xFF90A4AE), // Blue Grey 300
+    ).animate(_bgController);
+
+    _color3 = ColorTween(
+      begin: const Color(0xFFFFFFFF), // White
+      end: const Color(0xFF37474F), // Blue Grey 800 (deep tech grey)
+    ).animate(_bgController);
+
     currentColor = Colors.white;
   }
 
   @override
   void dispose() {
     _pageController.dispose();
-
+    _bgController.dispose();
     super.dispose();
   }
 
@@ -61,42 +86,71 @@ class _LayoutPageState extends State<LayoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentYear = DateTime.now().year;
-
     return Scaffold(
       key: _scaffoldKey,
       drawer: _buildDrawer(context),
-      body: Column(
-        children: [
-          // Mobile Header
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            height: 80,
-            color: Colors.blueGrey[900],
-            child: Row(
+      body: AnimatedBuilder(
+        animation: _bgController,
+        builder: (context, child) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.center,
+                radius: 1.2,
+                colors: [
+                  _color1.value ?? Colors.black,
+                  _color2.value ?? Colors.blue,
+                  _color3.value ?? Colors.white,
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
+            child: Column(
               children: [
-                // Hamburger menu
-                IconButton(
-                  icon: Icon(Icons.menu, color: Colors.white),
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                ),
-                SizedBox(width: 8),
+                // Mobile Header
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.blueGrey[900],
+                    boxShadow: [
+                      BoxShadow(
+                        // ignore: deprecated_member_use
+                        color: Colors.deepOrange.withOpacity(0.3),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  height: 80,
 
-                // Centered logo or search
-                Expanded(child: Center(child: _LogoText())),
+                  child: Row(
+                    children: [
+                      // Hamburger menu
+                      IconButton(
+                        icon: Icon(Icons.menu, color: Colors.white),
+                        onPressed: () =>
+                            _scaffoldKey.currentState?.openDrawer(),
+                      ),
+                      SizedBox(width: 8),
+
+                      // Centered logo or search
+                      Expanded(child: Center(child: _LogoText())),
+                    ],
+                  ),
+                ),
+                // Body content with animated gradient
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: bottomBarPages,
+                  ),
+                ),
               ],
             ),
-          ),
-
-          // Body content
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(), // disables swipe
-              children: bottomBarPages,
-            ),
-          ),
-        ],
+          );
+        },
       ),
 
       // Footer

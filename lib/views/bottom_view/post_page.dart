@@ -154,7 +154,7 @@ class _PostPageState extends State<PostPage> {
         dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
       ),
       child: AnimationList(
-        animationDirection: AnimationDirection.horizontal,
+        animationDirection: AnimationDirection.vertical,
         duration: 1000,
         reBounceDepth: 10.0,
         children: postCards,

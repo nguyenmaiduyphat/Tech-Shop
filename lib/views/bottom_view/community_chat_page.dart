@@ -1,11 +1,15 @@
 import 'dart:io';
+import 'dart:io' as io;
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:tech_fun/components/animated_chatmessage.dart';
 
 class ChatMessage {
   final String userId;
@@ -32,7 +36,8 @@ class CommunityChatPage extends StatefulWidget {
   State<CommunityChatPage> createState() => _CommunityChatPageState();
 }
 
-class _CommunityChatPageState extends State<CommunityChatPage> {
+class _CommunityChatPageState extends State<CommunityChatPage>
+    with SingleTickerProviderStateMixin {
   final List<ChatMessage> messages = [
     ChatMessage(
       userId: "user_2",
@@ -69,27 +74,25 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
   ];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  File? _selectedImage;
 
   final String currentUserId = "user_1"; // fake current user ID
 
   void _sendMessage() {
     final text = _controller.text.trim();
-    if (text.isEmpty && _selectedImage == null) return;
+    if (text.isEmpty && _xfile == null) return;
 
     final newMessage = ChatMessage(
       userId: currentUserId,
       userName: "You",
       userAvatarUrl: "assets/user/user1.jpg",
       text: text,
-      image: "",
+      image: 'assets/product/image.png',
       sentAt: DateTime.now().toString().split('.')[0],
     );
-
     setState(() {
       messages.add(newMessage);
       _controller.clear();
-      _selectedImage = null;
+      _xfile = null;
     });
 
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -101,19 +104,26 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
     });
   }
 
-  File? _imageFile;
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery, // or ImageSource.camera
-    );
+  XFile? _xfile;
+  Uint8List? _imageBytes;
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
+      if (kIsWeb) {
+        // Web: cần dùng readAsBytes
+        _imageBytes = await pickedFile.readAsBytes();
+      }
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _xfile = pickedFile;
       });
     }
   }
 
+  // MESSAGE FORM
   Widget _buildMessage(ChatMessage message) {
     final isMe = message.userId == currentUserId;
 
@@ -128,20 +138,24 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
           : CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: isMe
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
           children: [
             Text(
               isMe
-                  ? "${message.sentAt} - ${message.userName}"
+                  ? "${message.sentAt} - You"
                   : "${message.userName} - ${message.sentAt}",
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
-                color: Colors.black54,
+                color: isMe
+                    ? const Color.fromARGB(255, 255, 255, 255)
+                    : const Color.fromARGB(255, 255, 153, 0),
               ),
             ),
           ],
         ),
-
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.all(12),
@@ -149,8 +163,20 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
             maxWidth: MediaQuery.of(context).size.width * 0.65,
           ),
           decoration: BoxDecoration(
-            color: isMe ? Colors.teal[100] : Colors.grey[300],
-            borderRadius: BorderRadius.circular(12),
+            color: isMe ? Colors.teal[300] : Colors.grey[300],
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+              bottomLeft: Radius.circular(isMe ? 12 : 0),
+              bottomRight: Radius.circular(isMe ? 0 : 12),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(2, 2),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: isMe
@@ -158,7 +184,15 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
                 : CrossAxisAlignment.start,
             children: [
               if (message.text.isNotEmpty)
-                Text(message.text, style: TextStyle(fontSize: 14)),
+                Text(
+                  message.text,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isMe
+                        ? const Color.fromARGB(255, 255, 255, 255)
+                        : const Color.fromARGB(255, 255, 153, 0),
+                  ),
+                ),
               if (message.image.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
@@ -191,70 +225,137 @@ class _CommunityChatPageState extends State<CommunityChatPage> {
     );
   }
 
+  Widget buildSelectedImageWidget() {
+    if (_xfile == null) return const SizedBox();
+
+    if (kIsWeb) {
+      if (_imageBytes == null) return const Text("No image data");
+      return Image.memory(
+        _imageBytes!,
+        height: 120,
+        width: 120,
+        fit: BoxFit.cover,
+      );
+    } else {
+      final file = File(_xfile!.path);
+      if (!file.existsSync()) return const Text("File not found");
+      return Image.file(file, height: 120, width: 120, fit: BoxFit.cover);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return Stack(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(bottom: 90 + bottomPadding),
-          child: ScrollConfiguration(
-            behavior: const MaterialScrollBehavior().copyWith(
-              dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
-            ),
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: messages.length,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              itemBuilder: (context, index) => _buildMessage(messages[index]),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 75 + bottomPadding),
+            child: ScrollConfiguration(
+              behavior: const MaterialScrollBehavior().copyWith(
+                dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
+              ),
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: messages.length,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                itemBuilder: (context, index) {
+                  final message = messages[index];
+                  final isMe = message.userId == currentUserId;
+                  return AnimatedChatMessage(message: message, isMe: isMe);
+                },
+              ),
             ),
           ),
-        ),
 
-        // Input box
-        Positioned(
-          left: 16,
-          right: 16,
-          bottom: 20,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
+          // Input box
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 10,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  icon: Icon(Icons.image, color: Colors.teal),
-                  onPressed: _pickImage,
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: "Type a message...",
-                      border: InputBorder.none,
-                    ),
-                    onSubmitted: (_) => _sendMessage(),
+                if (_xfile != null)
+                  Stack(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: buildSelectedImageWidget(),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _xfile = null;
+                              _imageBytes = null;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.image, color: Colors.teal),
+                        onPressed: _pickImage,
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: _controller,
+                          decoration: const InputDecoration(
+                            hintText: "Type a message...",
+                            border: InputBorder.none,
+                          ),
+                          onSubmitted: (_) => _sendMessage(),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.send, color: Colors.teal),
+                        onPressed: _sendMessage,
+                      ),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send, color: Colors.teal),
-                  onPressed: _sendMessage,
-                ),
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
