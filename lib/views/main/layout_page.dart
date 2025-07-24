@@ -7,6 +7,10 @@ import 'package:tech_fun/components/user_avatar.dart';
 import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
 import 'package:tech_fun/views/bottom_view/my_store_page.dart';
 import 'package:tech_fun/views/bottom_view/post_page.dart';
+import 'package:tech_fun/views/main/inform_page.dart';
+import 'package:tech_fun/views/mid_view/event_page.dart';
+import 'package:tech_fun/views/mid_view/news_page.dart';
+import 'package:tech_fun/views/mid_view/product_tech_page.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({super.key});
@@ -246,9 +250,29 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
               Divider(color: Colors.white54),
 
               // Menu Items
-              DrawerMenuItem("Products", () => Navigator.pop(context)),
-              DrawerMenuItem("News", () => Navigator.pop(context)),
-              DrawerMenuItem("Events", () => Navigator.pop(context)),
+              DrawerMenuItem("Products", () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProductTechPage(),
+                  ),
+                );
+              }),
+              DrawerMenuItem("News", () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NewsPage()),
+                );
+              }),
+              DrawerMenuItem("Events", () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EventPage()),
+                );
+              }),
 
               Divider(color: Colors.white54),
 
@@ -284,20 +308,16 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                           ElevatedButton(
                             onPressed: () {
                               setState(() {
-                                loggedIn = true;
                                 Navigator.pop(context);
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const InformPage(),
+                                  ),
+                                );
                               });
                             },
-                            child: Text("Login"),
-                          ),
-                          SizedBox(height: 8),
-                          OutlinedButton(
-                            onPressed: () {
-                              setState(() {
-                                Navigator.pop(context);
-                              });
-                            },
-                            child: Text("Register"),
+                            child: Text("Login/Register"),
                           ),
                         ],
                       ),

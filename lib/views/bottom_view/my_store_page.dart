@@ -199,7 +199,7 @@ class _MyStorePageState extends State<MyStorePage> {
                   ),
                   subtitle: item['price'] != null
                       ? Text(
-                          'Price: \$${item['price']}',
+                          '\$${item['price']}',
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 14,
