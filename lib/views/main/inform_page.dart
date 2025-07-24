@@ -163,7 +163,7 @@ class _InformPageState extends State<InformPage> {
 
   Widget _buildRegisterPage() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 60),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
