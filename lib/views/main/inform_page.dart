@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -122,36 +123,54 @@ class _InformPageState extends State<InformPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _buildTextField(label: 'Username', icon: Icons.person_outline),
+              SlideInFromLeft(
+                delay: const Duration(milliseconds: 100),
+                child: _buildTextField(
+                  label: 'Username',
+                  icon: Icons.person_outline,
+                ),
+              ),
               const SizedBox(height: 20),
-              _buildTextField(
-                label: 'Password',
-                icon: Icons.lock_outline,
-                obscure: true,
+              SlideInFromLeft(
+                delay: const Duration(milliseconds: 200),
+                child: _buildTextField(
+                  label: 'Password',
+                  icon: Icons.lock_outline,
+                  obscure: true,
+                ),
               ),
               const SizedBox(height: 30),
-              SizedBox(
-                width: 200,
-                height: 40,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+              SlideInFromLeft(
+                delay: const Duration(milliseconds: 300),
+                child: SizedBox(
+                  width: 200,
+                  height: 40,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    "Login",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    onPressed: () {},
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
-              TextButton(
-                onPressed: _goToRegister,
-                child: const Text(
-                  "Don't have an account? Register",
-                  style: TextStyle(color: Colors.white70),
+              SlideInFromLeft(
+                delay: const Duration(milliseconds: 400),
+                child: TextButton(
+                  onPressed: _goToRegister,
+                  child: const Text(
+                    "Don't have an account? Register",
+                    style: TextStyle(color: Colors.white70),
+                  ),
                 ),
               ),
             ],
@@ -167,94 +186,142 @@ class _InformPageState extends State<InformPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField(label: 'Username', icon: Icons.person),
-          _buildTextField(label: 'Password', icon: Icons.lock, obscure: true),
-          _buildTextField(
-            label: 'Confirm Password',
-            icon: Icons.lock_outline,
-            obscure: true,
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 100),
+            child: _buildTextField(label: 'Username', icon: Icons.person),
           ),
-          _buildTextField(label: 'Email', icon: Icons.email),
-          _buildTextField(label: 'Phone Number', icon: Icons.phone),
-          _buildTextField(label: 'Address', icon: Icons.home),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 200),
+            child: _buildTextField(
+              label: 'Password',
+              icon: Icons.lock,
+              obscure: true,
+            ),
+          ),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 300),
+            child: _buildTextField(
+              label: 'Confirm Password',
+              icon: Icons.lock_outline,
+              obscure: true,
+            ),
+          ),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 400),
+            child: _buildTextField(label: 'Email', icon: Icons.email),
+          ),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 500),
+            child: _buildTextField(label: 'Phone Number', icon: Icons.phone),
+          ),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 600),
+            child: _buildTextField(label: 'Address', icon: Icons.home),
+          ),
 
           const SizedBox(height: 12),
-          DropdownButtonFormField<String>(
-            value: selectedGender,
-            dropdownColor: Colors.grey.shade900,
-            style: const TextStyle(color: Colors.white),
-            decoration: _inputDecoration("Gender"),
-            items: const [
-              DropdownMenuItem(value: "Male", child: Text("Male")),
-              DropdownMenuItem(value: "Female", child: Text("Female")),
-              DropdownMenuItem(value: "Other", child: Text("Other")),
-            ],
-            onChanged: (value) => setState(() => selectedGender = value),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 700),
+            child: DropdownButtonFormField<String>(
+              value: selectedGender,
+              dropdownColor: Colors.grey.shade900,
+              style: const TextStyle(color: Colors.white),
+              decoration: _inputDecoration("Gender"),
+              items: const [
+                DropdownMenuItem(value: "Male", child: Text("Male")),
+                DropdownMenuItem(value: "Female", child: Text("Female")),
+                DropdownMenuItem(value: "Other", child: Text("Other")),
+              ],
+              onChanged: (value) => setState(() => selectedGender = value),
+            ),
           ),
           const SizedBox(height: 12),
-          _buildTextField(
-            label: 'Birthdate (YYYY-MM-DD)',
-            icon: Icons.date_range,
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 800),
+            child: _buildTextField(
+              label: 'Birthdate (YYYY-MM-DD)',
+              icon: Icons.date_range,
+            ),
           ),
-          _buildTextField(
-            label: 'Citizen Identification Card',
-            icon: Icons.credit_card,
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 900),
+            child: _buildTextField(
+              label: 'Citizen Identification Card',
+              icon: Icons.credit_card,
+            ),
           ),
-          _buildTextField(label: 'Bank Account', icon: Icons.account_balance),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 1000),
+            child: _buildTextField(
+              label: 'Bank Account',
+              icon: Icons.account_balance,
+            ),
+          ),
 
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Checkbox(
-                value: readPolicy,
-                activeColor: Colors.blueAccent,
-                onChanged: (value) =>
-                    setState(() => readPolicy = value ?? false),
-              ),
-              const Expanded(
-                child: Text(
-                  "I accept the policy and terms",
-                  style: TextStyle(color: Colors.white70),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 1100),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: readPolicy,
+                  activeColor: Colors.blueAccent,
+                  onChanged: (value) =>
+                      setState(() => readPolicy = value ?? false),
                 ),
-              ),
-            ],
+                const Expanded(
+                  child: Text(
+                    "I accept the policy and terms",
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 24),
-          Center(
-            child: SizedBox(
-              width: 200,
-              height: 40,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 1200),
+            child: Center(
+              child: SizedBox(
+                width: 200,
+                height: 40,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.cyan,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
-                ),
-                onPressed: () {
-                  if (readPolicy) {
-                    // Register logic
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("You must accept the policy"),
-                      ),
-                    );
-                  }
-                },
-                child: const Text(
-                  "Register",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  onPressed: () {
+                    if (readPolicy) {
+                      // Register logic
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("You must accept the policy"),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text(
+                    "Register",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),
           ),
-          TextButton(
-            onPressed: _goToLogin,
-            child: const Text(
-              "Already have an account? Login",
-              style: TextStyle(color: Colors.white70),
+          SlideInFromLeft(
+            delay: const Duration(milliseconds: 1300),
+            child: Center(
+              child: TextButton(
+                onPressed: _goToLogin,
+                child: const Text(
+                  "Already have an account? Login",
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
             ),
           ),
         ],
@@ -293,6 +360,7 @@ class _InformPageState extends State<InformPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
+        cursorColor: const Color.fromARGB(255, 14, 167, 134),
         obscureText: obscure,
         style: const TextStyle(color: Colors.white),
         decoration: _inputDecoration(label).copyWith(
@@ -300,5 +368,63 @@ class _InformPageState extends State<InformPage> {
         ),
       ),
     );
+  }
+}
+
+class SlideInFromLeft extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+  final Duration duration;
+  final Curve curve;
+
+  const SlideInFromLeft({
+    Key? key,
+    required this.child,
+    this.delay = Duration.zero,
+    this.duration = const Duration(milliseconds: 500),
+    this.curve = Curves.easeOut,
+  }) : super(key: key);
+
+  @override
+  State<SlideInFromLeft> createState() => _SlideInFromLeftState();
+}
+
+class _SlideInFromLeftState extends State<SlideInFromLeft>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
+  bool _visible = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+
+    _animation = Tween<Offset>(
+      begin: const Offset(-1, 0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+
+    // Delay before showing animation
+    Timer(widget.delay, () {
+      if (mounted) {
+        setState(() => _visible = true);
+        _controller.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _visible
+        ? SlideTransition(position: _animation, child: widget.child)
+        : const SizedBox.shrink();
   }
 }

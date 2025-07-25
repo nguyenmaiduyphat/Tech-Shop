@@ -100,6 +100,7 @@ class CommentSection extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
+                  cursorColor: const Color.fromARGB(255, 14, 167, 134),
                   controller: commentController,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(

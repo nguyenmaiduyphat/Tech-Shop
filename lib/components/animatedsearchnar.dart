@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class AnimatedSearchBar extends StatelessWidget {
   final Function(String) onSubmitted;
 
-  const AnimatedSearchBar({
-    super.key,
-    required this.onSubmitted,
-  });
+  const AnimatedSearchBar({super.key, required this.onSubmitted});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +20,7 @@ class AnimatedSearchBar extends StatelessWidget {
           children: [
             Expanded(
               child: TextField(
+                cursorColor: const Color.fromARGB(255, 14, 167, 134),
                 autofocus: true,
                 onSubmitted: onSubmitted,
                 textAlign: TextAlign.start, // ← align text to the left

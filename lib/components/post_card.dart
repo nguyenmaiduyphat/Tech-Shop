@@ -303,6 +303,7 @@ class _PostCardState extends State<PostCard> {
 
   Widget _buildReadOnlyField(String label, String value) {
     return TextField(
+      cursorColor: const Color.fromARGB(255, 14, 167, 134),
       style: TextStyle(color: Colors.white),
       readOnly: true,
       decoration: InputDecoration(

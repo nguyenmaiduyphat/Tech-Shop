@@ -207,7 +207,12 @@ class _NewsPageState extends State<NewsPage>
                               controller: _searchController,
                               autofocus: true,
                               style: const TextStyle(color: Colors.white),
-                              cursorColor: Colors.white,
+                              cursorColor: const Color.fromARGB(
+                                255,
+                                14,
+                                167,
+                                134,
+                              ),
                               decoration: InputDecoration(
                                 hintText: 'Tìm kiếm...',
                                 hintStyle: const TextStyle(

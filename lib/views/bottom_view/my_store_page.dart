@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:animation_list/animation_list.dart';
 import 'package:flutter/material.dart';
+import 'package:tech_fun/views/mid_view/edit_product_page.dart';
+import 'package:tech_fun/views/mid_view/product_detail_page.dart';
 
 class MyStorePage extends StatefulWidget {
   const MyStorePage({super.key});
@@ -15,7 +17,17 @@ class _MyStorePageState extends State<MyStorePage> {
     (index) => {
       'name': 'Product $index',
       'price': (index + 1) * 10.0,
-      'image': 'assets/product/product${(index % 3) + 1}.jpg',
+      'image': [
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+      ],
     },
   );
 
@@ -183,7 +195,7 @@ class _MyStorePageState extends State<MyStorePage> {
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
-                      item['image'],
+                      item['image'][0],
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
@@ -214,6 +226,7 @@ class _MyStorePageState extends State<MyStorePage> {
                         index: index,
                         list: list,
                         isPost: false,
+                        item: item,
                       );
                     },
                     child: const Icon(Icons.more_vert, color: Colors.white70),
@@ -281,6 +294,7 @@ class _MyStorePageState extends State<MyStorePage> {
                             index: index,
                             list: list,
                             isPost: true,
+                            item: item,
                           );
                         },
                         child: const Icon(
@@ -301,6 +315,7 @@ class _MyStorePageState extends State<MyStorePage> {
     required Offset offset,
     required int index,
     required List<Map<String, dynamic>> list,
+    required Map<String, dynamic> item,
     required bool isPost,
   }) async {
     final Size screenSize = MediaQuery.of(context).size;
@@ -320,13 +335,41 @@ class _MyStorePageState extends State<MyStorePage> {
       elevation: 12,
       items: isPost
           ? [
-              _buildHoverMenuItem(value: 'remove', label: '🗑️ Remove'),
-              _buildHoverMenuItem(value: 'view', label: '👁️ View Detail'),
+              _buildHoverMenuItem(
+                value: 'remove',
+                label: '🗑️ Remove',
+                onPressed: () {},
+              ),
+              _buildHoverMenuItem(
+                value: 'view',
+                label: '👁️ View Detail',
+                onPressed: () {},
+              ),
             ]
           : [
-              _buildHoverMenuItem(value: 'remove', label: '🗑️ Remove'),
-              _buildHoverMenuItem(value: 'edit', label: '✏️ Edit'),
-              _buildHoverMenuItem(value: 'view', label: '👁️ View Detail'),
+              _buildHoverMenuItem(
+                value: 'remove',
+                label: '🗑️ Remove',
+                onPressed: () {},
+              ),
+              _buildHoverMenuItem(
+                value: 'edit',
+                label: '✏️ Edit',
+                onPressed: () {},
+              ),
+              _buildHoverMenuItem(
+                value: 'view',
+                label: '👁️ View Detail',
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ProductDetailPage(imageGallery: item['image']),
+                    ),
+                  );
+                },
+              ),
             ],
     );
 
@@ -339,6 +382,10 @@ class _MyStorePageState extends State<MyStorePage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Edit clicked')));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => EditProductPage()),
+      );
     } else if (result == 'view') {
       // TODO: Navigate or show detail here
       ScaffoldMessenger.of(
@@ -350,6 +397,7 @@ class _MyStorePageState extends State<MyStorePage> {
   PopupMenuItem<String> _buildHoverMenuItem({
     required String value,
     required String label,
+    required VoidCallback onPressed,
   }) {
     bool isHovered = false;
     return PopupMenuItem<String>(
@@ -361,10 +409,13 @@ class _MyStorePageState extends State<MyStorePage> {
             onEnter: (_) => setState(() => isHovered = true),
             onExit: (_) => setState(() => isHovered = false),
             cursor: SystemMouseCursors.click,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: isHovered ? Colors.deepOrange : Colors.white,
+            child: TextButton(
+              onPressed: onPressed,
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: isHovered ? Colors.deepOrange : Colors.white,
+                ),
               ),
             ),
           );

@@ -336,6 +336,7 @@ class _CommunityChatPageState extends State<CommunityChatPage>
                       ),
                       Expanded(
                         child: TextField(
+                          cursorColor: const Color.fromARGB(255, 14, 167, 134),
                           controller: _controller,
                           decoration: const InputDecoration(
                             hintText: "Type a message...",

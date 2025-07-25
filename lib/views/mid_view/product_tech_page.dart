@@ -3,7 +3,9 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
+import 'package:tech_fun/views/mid_view/product_detail_page.dart';
 
 class ProductTechPage extends StatefulWidget {
   const ProductTechPage({super.key});
@@ -19,7 +21,11 @@ class _ProductTechPageState extends State<ProductTechPage>
     (index) => {
       'name': 'Product $index',
       'price': (index + 1) * 10.0,
-      'image': 'assets/product/product${(index % 3) + 1}.jpg',
+      'image': [
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+        'assets/product/product${(index % 3) + 1}.jpg',
+      ],
       'discount': 30,
       'rating': 4.5,
       'sold': 45,
@@ -390,8 +396,8 @@ class _ProductTechPageState extends State<ProductTechPage>
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
                               childAspectRatio: 0.75,
                             ),
                         itemCount: products.length,
@@ -403,7 +409,7 @@ class _ProductTechPageState extends State<ProductTechPage>
                             columnCount: 2,
                             child: ScaleAnimation(
                               child: FadeInAnimation(
-                                child: _HoverCard(product: product),
+                                child: ProductCardHoverEffect(product: product),
                               ),
                             ),
                           );
@@ -475,214 +481,6 @@ class _ProductTechPageState extends State<ProductTechPage>
   }
 }
 
-class _HoverCard extends StatefulWidget {
-  final Map<String, dynamic> product;
-
-  const _HoverCard({required this.product});
-
-  @override
-  State<_HoverCard> createState() => __HoverCardState();
-}
-
-class __HoverCardState extends State<_HoverCard> {
-  double _scale = 1.0;
-  bool isHovered = false;
-
-  void _onEnter(_) {
-    if (kIsWeb ||
-        defaultTargetPlatform == TargetPlatform.macOS ||
-        defaultTargetPlatform == TargetPlatform.windows) {
-      setState(() {
-        _scale = 0.97;
-        isHovered = true;
-      });
-    }
-  }
-
-  void _onExit(_) {
-    if (kIsWeb ||
-        defaultTargetPlatform == TargetPlatform.macOS ||
-        defaultTargetPlatform == TargetPlatform.windows) {
-      setState(() {
-        _scale = 1;
-        isHovered = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: _onEnter,
-      onExit: _onExit,
-      child: AnimatedScale(
-        scale: _scale,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        child: Card(
-          color: Colors.transparent,
-          margin: const EdgeInsets.all(8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 6,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF0F2027),
-                  Color(0xFF203A43),
-                  Color(0xFF2C5364),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 🖼️ Image Top Center
-                  Expanded(
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            widget.product['image'],
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // 🏷️ Product Name (Left, Ellipsis)
-                  Text(
-                    widget.product['name'],
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: isHovered ? Colors.deepOrange : Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  // 💰 Price & Discount
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '\$${widget.product['price'].toStringAsFixed(2)}',
-                        style: TextStyle(
-                          color: isHovered ? Colors.deepOrange : Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      if (widget.product.containsKey('discount'))
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.redAccent,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '-${widget.product['discount']}%',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  // ⭐ Rating + 🛒 Sold
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${widget.product['rating']}',
-                        style: TextStyle(
-                          color: isHovered ? Colors.deepOrange : Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        '${widget.product['sold']} sold',
-                        style: TextStyle(
-                          color: isHovered ? Colors.deepOrange : Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  // 📍 Location
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.delivery_dining_sharp,
-                        color: Colors.green[800],
-                        size: 14,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        '${widget.product['delivery']} ${widget.product['delivery'] > 1 ? 'days' : 'day'}',
-                        style: TextStyle(
-                          color: isHovered ? Colors.deepOrange : Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        "|",
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                      SizedBox(width: 4),
-                      Icon(
-                        Icons.location_on,
-                        color: isHovered ? Colors.deepOrange : Colors.white70,
-                        size: 14,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        widget.product['location'],
-                        style: TextStyle(
-                          color: isHovered ? Colors.deepOrange : Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class TechHeader extends StatelessWidget {
   final VoidCallback onFilterTap;
 
@@ -728,6 +526,7 @@ class TechHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const TextField(
+                cursorColor: const Color.fromARGB(255, 14, 167, 134),
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   icon: Icon(Icons.search, color: Colors.white70),

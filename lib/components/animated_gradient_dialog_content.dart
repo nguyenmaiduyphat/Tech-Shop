@@ -79,6 +79,7 @@ class AnimatedGradientDialogContentState
             ),
             const SizedBox(height: 8),
             TextField(
+              cursorColor: const Color.fromARGB(255, 14, 167, 134),
               controller: widget.reasonController,
               decoration: InputDecoration(
                 labelText: 'Reason',
@@ -118,6 +119,7 @@ class AnimatedGradientDialogContentState
 
   Widget _buildReadOnlyField(String label, String value) {
     return TextField(
+      cursorColor: const Color.fromARGB(255, 14, 167, 134),
       style: TextStyle(color: Colors.white),
       readOnly: true,
       decoration: InputDecoration(

@@ -296,30 +296,53 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                         name: userName,
                         rank: userRank,
                         onTap: () {
-                          setState(() {
-                            loggedIn = false;
-                            Navigator.pop(context);
-                          });
+                          setState(() {});
                         },
                       )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                Navigator.pop(context);
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const InformPage(),
-                                  ),
-                                );
-                              });
-                            },
-                            child: Text("Login/Register"),
+                    : Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              Navigator.pop(context);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const InformPage(),
+                                ),
+                              );
+                            });
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              const Color(0xFF1F1F1F),
+                            ),
+                            foregroundColor: MaterialStateProperty.all(
+                              const Color.fromARGB(255, 212, 212, 212),
+                            ),
+                            padding: MaterialStateProperty.all(
+                              const EdgeInsets.symmetric(
+                                horizontal: 30,
+                                vertical: 15,
+                              ),
+                            ),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            elevation: MaterialStateProperty.all(8),
+                            shadowColor: MaterialStateProperty.all(
+                              const Color.fromARGB(
+                                255,
+                                59,
+                                59,
+                                59,
+                              ).withOpacity(0.4),
+                            ),
+                            // You can remove textStyle here if it's already in the theme
                           ),
-                        ],
+                          child: const Text("Login / Register"),
+                        ),
                       ),
               ),
             ],

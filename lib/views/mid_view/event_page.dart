@@ -204,10 +204,15 @@ class _EventPageState extends State<EventPage>
                         if (openSearch)
                           Expanded(
                             child: TextField(
+                              cursorColor: const Color.fromARGB(
+                                255,
+                                14,
+                                167,
+                                134,
+                              ),
                               controller: _searchController,
                               autofocus: true,
                               style: const TextStyle(color: Colors.white),
-                              cursorColor: Colors.white,
                               decoration: InputDecoration(
                                 hintText: 'Tìm kiếm...',
                                 hintStyle: const TextStyle(
