@@ -2,7 +2,11 @@ import 'dart:ui';
 import 'package:animation_list/animation_list.dart';
 import 'package:flutter/material.dart';
 import 'package:tech_fun/views/mid_view/edit_product_page.dart';
+import 'package:tech_fun/views/mid_view/post_detail_page.dart';
+import 'package:tech_fun/views/mid_view/post_store_page.dart';
+import 'package:tech_fun/views/mid_view/product_bought_page.dart';
 import 'package:tech_fun/views/mid_view/product_detail_page.dart';
+import 'package:tech_fun/views/mid_view/product_store_page.dart';
 
 class MyStorePage extends StatefulWidget {
   const MyStorePage({super.key});
@@ -95,19 +99,36 @@ class _MyStorePageState extends State<MyStorePage> {
               const SizedBox(height: 24),
 
               // Your Products
-              _buildSectionTitle('Your Products'),
+              _buildSectionTitle('Your Products', () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProductStorePage(),
+                  ),
+                );
+              }),
               _buildProductList(products, emptyMessage: 'Upload your product'),
 
               const SizedBox(height: 16),
 
               // Your Posts
-              _buildSectionTitle('Your Posts'),
+              _buildSectionTitle('Your Posts', () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => PostStorePage()),
+                );
+              }),
               _buildPostList(posts, emptyMessage: 'No posts yet'),
 
               const SizedBox(height: 16),
 
               // Bought Products
-              _buildSectionTitle('Products Bought'),
+              _buildSectionTitle('Products Bought', () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProductBoughtPage()),
+                );
+              }),
               _buildProductList(
                 boughtProducts,
                 editable: false,
@@ -139,7 +160,7 @@ class _MyStorePageState extends State<MyStorePage> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, VoidCallback onPressed) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -152,7 +173,7 @@ class _MyStorePageState extends State<MyStorePage> {
           ),
         ),
         TextButton.icon(
-          onPressed: () {},
+          onPressed: onPressed,
           icon: const Icon(Icons.add, color: Colors.white70),
           label: const Text('More', style: TextStyle(color: Colors.white70)),
         ),
@@ -343,7 +364,14 @@ class _MyStorePageState extends State<MyStorePage> {
               _buildHoverMenuItem(
                 value: 'view',
                 label: '👁️ View Detail',
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PostDetailPage(),
+                    ),
+                  );
+                },
               ),
             ]
           : [

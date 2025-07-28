@@ -11,11 +11,14 @@ class InformPage extends StatefulWidget {
   State<InformPage> createState() => _InformPageState();
 }
 
+enum LoginSubPage { login, forgotPassword }
+
 class _InformPageState extends State<InformPage> {
   final PageController _pageController = PageController();
   bool isLoginPage = true;
   bool readPolicy = false;
   String? selectedGender;
+  LoginSubPage loginSubPage = LoginSubPage.login; // new
 
   void _goToRegister() {
     _pageController.animateToPage(
@@ -116,8 +119,91 @@ class _InformPageState extends State<InformPage> {
     );
   }
 
-  Widget _buildLoginPage() {
+  Widget _buildForgotPasswordPage({Key? key}) {
     return Padding(
+      key: key,
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Enter your email to reset your password',
+            style: TextStyle(color: Colors.white70, fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'Email',
+              labelStyle: const TextStyle(color: Colors.white70),
+              filled: true,
+              fillColor: Colors.white10,
+              prefixIcon: const Icon(Icons.email, color: Colors.cyan),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Colors.cyanAccent,
+                  width: 2,
+                ),
+              ),
+            ),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 200,
+            height: 40,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.cyan,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: () {
+                // Add reset logic here
+              },
+              child: const Text(
+                'Reset Password',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 40),
+          SizedBox(
+            width: 200,
+            height: 40,
+            child: OutlinedButton(
+              onPressed: () {
+                setState(() {
+                  loginSubPage = LoginSubPage.login;
+                });
+              },
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.cyanAccent),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Text(
+                'Back to Login',
+                style: TextStyle(color: Colors.cyanAccent, fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoginContent({Key? key}) {
+    return Padding(
+      key: key,
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Center(
         child: SingleChildScrollView(
@@ -163,6 +249,25 @@ class _InformPageState extends State<InformPage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 30),
+              SlideInFromLeft(
+                delay: const Duration(milliseconds: 250),
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      loginSubPage = LoginSubPage.forgotPassword;
+                    });
+                  },
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               SlideInFromLeft(
                 delay: const Duration(milliseconds: 400),
                 child: TextButton(
@@ -175,6 +280,39 @@ class _InformPageState extends State<InformPage> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginPage() {
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        if (details.primaryVelocity != null) {
+          if (details.primaryVelocity! < -500) {
+            // Swipe Up
+            if (loginSubPage == LoginSubPage.login) {
+              setState(() => loginSubPage = LoginSubPage.forgotPassword);
+            }
+          } else if (details.primaryVelocity! > 500) {
+            // Swipe Down
+            if (loginSubPage == LoginSubPage.forgotPassword) {
+              setState(() => loginSubPage = LoginSubPage.login);
+            }
+          }
+        }
+      },
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 400),
+        switchInCurve: Curves.easeInOut,
+        switchOutCurve: Curves.easeInOut,
+        child: Container(
+          key: ValueKey(loginSubPage),
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height, // make full height
+          child: loginSubPage == LoginSubPage.login
+              ? _buildLoginContent()
+              : _buildForgotPasswordPage(),
         ),
       ),
     );

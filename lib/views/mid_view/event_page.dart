@@ -5,6 +5,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'dart:math';
 
 import 'package:tech_fun/views/main/layout_page.dart';
+import 'package:tech_fun/views/mid_view/event_detail_page.dart';
 
 class EventPage extends StatefulWidget {
   const EventPage({super.key});
@@ -19,107 +20,127 @@ class _EventPageState extends State<EventPage>
   late Animation<Color?> _color1;
   late Animation<Color?> _color2;
 
-  final List<Map<String, String>> eventList = [
+  final List<Map<String, dynamic>> eventList = [
     {
       'title': 'Flutter 3.22 Released',
       'description': 'New Material 3 widgets and performance improvements.',
       'image': 'assets/product/product1.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'AI-Powered Coding with Dart',
       'description':
           'Explore the integration of AI tools with Dart and Flutter.',
       'image': 'assets/product/product1.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Quantum Computing Trends',
       'description': 'A look into how quantum computing impacts tech industry.',
       'image': 'assets/product/product1.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Cloud Firestore vs. Realtime Database',
       'description': 'Which Firebase solution suits your app needs?',
       'image': 'assets/product/product2.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Top Flutter Packages in 2025',
       'description': 'Check out the most useful Flutter packages this year.',
       'image': 'assets/product/product2.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Understanding State Management',
       'description': 'Get a deep dive into Riverpod, Bloc and Provider.',
       'image': 'assets/product/product3.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Google I/O 2025 Highlights',
       'description': 'Key announcements and innovations from Google.',
       'image': 'assets/product/product3.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Dart 3.2 Brings Async Enhancements',
       'description': 'Better support for concurrent programming in Dart.',
       'image': 'assets/product/product4.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Why You Should Learn Flutter Today',
       'description': 'Fast, cross-platform development is the future.',
       'image': 'assets/product/product4.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Building Responsive UI in Flutter',
       'description': 'Tips and tricks for adaptive layouts.',
       'image': 'assets/product/product5.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Tech Salaries in 2025: What’s Changing?',
       'description': 'A report on the latest compensation trends.',
       'image': 'assets/product/product5.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Cybersecurity in Mobile Apps',
       'description': 'Best practices to protect your user data.',
       'image': 'assets/product/product6.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Flutter for Web: Ready for Production?',
       'description': 'Analyzing the strengths and challenges.',
       'image': 'assets/product/product6.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'The Rise of Edge Computing',
       'description': 'Shifting workloads closer to users.',
       'image': 'assets/product/product7.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Top VS Code Extensions for Flutter Devs',
       'description': 'Boost your productivity with these tools.',
       'image': 'assets/product/product7.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Deploying Flutter Apps to App Store & Play Store',
       'description': 'Step-by-step deployment guide.',
       'image': 'assets/product/product8.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Augmented Reality with Flutter',
       'description': 'Integrate AR features into your apps.',
       'image': 'assets/product/product8.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'CI/CD for Flutter with GitHub Actions',
       'description': 'Automate your build and release process.',
       'image': 'assets/product/product9.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'The Future of Cross-platform Development',
       'description': 'Flutter vs React Native: who wins?',
       'image': 'assets/product/product9.jpg',
+      'status': EventStatus.none,
     },
     {
       'title': 'Using AI for UX Personalization',
       'description': 'Deliver smarter UI with user behavior tracking.',
       'image': 'assets/product/product10.jpg',
+      'status': EventStatus.none,
     },
   ];
 
@@ -291,7 +312,7 @@ class _EventPageState extends State<EventPage>
                             ),
                           ),
                           itemBuilder: (context, index) {
-                            final news = eventList[index];
+                            final event = eventList[index];
 
                             return AnimationConfiguration.staggeredList(
                               position: index,
@@ -301,10 +322,29 @@ class _EventPageState extends State<EventPage>
                                 curve: Curves.easeOutCubic,
                                 child: FadeInAnimation(
                                   child: EventCard(
-                                    title: news['title']!,
-                                    description: news['description']!,
-                                    image: news['image']!,
+                                    title: event['title']!,
+                                    description: event['description']!,
+                                    image: event['image']!,
                                     gradient: techGradient,
+                                    status: event['status'] ?? EventStatus.none,
+                                    onPressed: () async {
+                                      final result =
+                                          await Navigator.push<EventStatus>(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EventDetailPage(
+                                                    eventStatus:
+                                                        event['status'],
+                                                  ),
+                                            ),
+                                          );
+                                      if (result != null) {
+                                        setState(() {
+                                          event['status'] = result;
+                                        });
+                                      }
+                                    },
                                   ),
                                 ),
                               ),
@@ -324,11 +364,15 @@ class _EventPageState extends State<EventPage>
   }
 }
 
+enum EventStatus { none, joined, refused }
+
 class EventCard extends StatelessWidget {
   final String title;
   final String description;
   final String image;
   final Gradient gradient;
+  final EventStatus status;
+  final VoidCallback onPressed;
 
   const EventCard({
     super.key,
@@ -336,57 +380,83 @@ class EventCard extends StatelessWidget {
     required this.description,
     required this.image,
     required this.gradient,
+    required this.status,
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                image,
-                width: 100,
-                height: 80,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    description,
-                    style: const TextStyle(fontSize: 14, color: Colors.white70),
-                  ),
-                ],
-              ),
+    // Choose border color based on status
+    Color borderColor;
+    switch (status) {
+      case EventStatus.joined:
+        borderColor = Colors.green;
+        break;
+      case EventStatus.refused:
+        borderColor = Colors.red;
+        break;
+      case EventStatus.none:
+      default:
+        borderColor = Colors.transparent;
+    }
+
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: borderColor,
+            width: 3,
+          ), // border width 3 for visible effect
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  image,
+                  width: 100,
+                  height: 80,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      description,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

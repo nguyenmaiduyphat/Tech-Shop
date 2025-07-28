@@ -11,6 +11,7 @@ import 'package:tech_fun/views/main/inform_page.dart';
 import 'package:tech_fun/views/mid_view/event_page.dart';
 import 'package:tech_fun/views/mid_view/news_page.dart';
 import 'package:tech_fun/views/mid_view/product_tech_page.dart';
+import 'package:tech_fun/views/mid_view/profile_page.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({super.key});
@@ -275,7 +276,13 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
               }),
 
               Divider(color: Colors.white54),
-
+              DrawerMenuItem("Profile", () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              }),
               // Search Input
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
