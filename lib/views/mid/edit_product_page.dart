@@ -8,7 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class EditProductPage extends StatefulWidget {
-  const EditProductPage({super.key});
+  final bool isLoggedIn;
+  const EditProductPage({super.key, required this.isLoggedIn});
 
   @override
   State<EditProductPage> createState() => _EditProductPageState();
@@ -109,7 +110,10 @@ class _EditProductPageState extends State<EditProductPage> {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LayoutPage()),
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          LayoutPage(isLoggedIn: widget.isLoggedIn),
+                    ),
                   );
                 },
                 child: Container(
@@ -206,7 +210,10 @@ class _EditProductPageState extends State<EditProductPage> {
               }
             },
             icon: const Icon(Icons.save),
-            label: const Text('Save Changes', style: TextStyle(color: Colors.deepOrange),),
+            label: const Text(
+              'Save Changes',
+              style: TextStyle(color: Colors.deepOrange),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.teal[700],
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

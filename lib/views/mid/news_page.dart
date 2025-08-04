@@ -8,7 +8,9 @@ import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/news_detail_page.dart';
 
 class NewsPage extends StatefulWidget {
-  const NewsPage({super.key});
+  final bool isLoggedIn;
+
+  const NewsPage({super.key, required this.isLoggedIn});
 
   @override
   State<NewsPage> createState() => _NewsPageState();
@@ -195,7 +197,8 @@ class _NewsPageState extends State<NewsPage>
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const LayoutPage(),
+                                builder: (_) =>
+                                    LayoutPage(isLoggedIn: widget.isLoggedIn),
                               ),
                             );
                           },
@@ -306,6 +309,7 @@ class _NewsPageState extends State<NewsPage>
                                     description: news['description']!,
                                     image: news['image']!,
                                     gradient: techGradient,
+                                    isLoggedIn: widget.isLoggedIn,
                                   ),
                                 ),
                               ),
@@ -330,6 +334,7 @@ class NewsCard extends StatelessWidget {
   final String description;
   final String image;
   final Gradient gradient;
+  final bool isLoggedIn;
 
   const NewsCard({
     super.key,
@@ -337,6 +342,7 @@ class NewsCard extends StatelessWidget {
     required this.description,
     required this.image,
     required this.gradient,
+    required this.isLoggedIn,
   });
 
   @override
@@ -345,7 +351,9 @@ class NewsCard extends StatelessWidget {
       onTap: () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const NewsDetailPage()),
+          MaterialPageRoute(
+            builder: (context) => NewsDetailPage(isLoggedIn: isLoggedIn),
+          ),
         );
       },
       child: Container(

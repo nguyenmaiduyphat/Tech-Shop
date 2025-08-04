@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class NewsDetailPage extends StatefulWidget {
-  const NewsDetailPage({super.key});
+  final bool isLoggedIn;
+
+  const NewsDetailPage({super.key, required this.isLoggedIn});
 
   @override
   State<NewsDetailPage> createState() => _NewsDetailPageState();
@@ -411,7 +413,8 @@ class _NewsDetailPageState extends State<NewsDetailPage>
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LayoutPage(),
+                        builder: (context) =>
+                            LayoutPage(isLoggedIn: widget.isLoggedIn),
                       ),
                     );
                   },

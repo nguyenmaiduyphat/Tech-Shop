@@ -22,7 +22,9 @@ class BoughtProduct {
 }
 
 class ProductBoughtPage extends StatelessWidget {
-  ProductBoughtPage({super.key});
+  final bool isLoggedIn;
+
+  ProductBoughtPage({super.key, required this.isLoggedIn});
 
   final List<BoughtProduct> boughtProducts = [
     BoughtProduct(
@@ -103,7 +105,10 @@ class ProductBoughtPage extends StatelessWidget {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => LayoutPage()),
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                LayoutPage(isLoggedIn: isLoggedIn),
+                          ),
                         ); // Replace with your actual navigation
                       },
                     ),

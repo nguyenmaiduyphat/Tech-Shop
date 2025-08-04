@@ -9,9 +9,15 @@ import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetailPage extends StatefulWidget {
+  final bool isLoggedIn;
+
   final List<String> imageGallery;
 
-  const ProductDetailPage({super.key, required this.imageGallery});
+  const ProductDetailPage({
+    super.key,
+    required this.imageGallery,
+    required this.isLoggedIn,
+  });
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -106,7 +112,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const LayoutPage()),
+                MaterialPageRoute(
+                  builder: (context) =>
+                      LayoutPage(isLoggedIn: widget.isLoggedIn),
+                ),
               );
             },
           ),
@@ -711,7 +720,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         itemBuilder: (context, index) {
           return SizedBox(
             width: 160, // Width of each product card
-            child: ProductCardHoverEffect(product: products[index]),
+            child: ProductCardHoverEffect(
+              product: products[index],
+              isLoggedIn: widget.isLoggedIn,
+            ),
           );
         },
       ),

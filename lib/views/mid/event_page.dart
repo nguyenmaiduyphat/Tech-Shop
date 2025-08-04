@@ -9,7 +9,9 @@ import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/event_detail_page.dart';
 
 class EventPage extends StatefulWidget {
-  const EventPage({super.key});
+  final bool isLoggedIn;
+
+  const EventPage({super.key, required this.isLoggedIn});
 
   @override
   State<EventPage> createState() => _EventPageState();
@@ -216,7 +218,8 @@ class _EventPageState extends State<EventPage>
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const LayoutPage(),
+                                builder: (_) =>
+                                    LayoutPage(isLoggedIn: widget.isLoggedIn),
                               ),
                             );
                           },
@@ -337,6 +340,8 @@ class _EventPageState extends State<EventPage>
                                                   EventDetailPage(
                                                     eventStatus:
                                                         event['status'],
+                                                    isLoggedIn:
+                                                        widget.isLoggedIn,
                                                   ),
                                             ),
                                           );
@@ -397,7 +402,7 @@ class EventCard extends StatelessWidget {
         borderColor = Colors.red;
         break;
       case EventStatus.none:
-      borderColor = Colors.transparent;
+        borderColor = Colors.transparent;
     }
 
     return GestureDetector(

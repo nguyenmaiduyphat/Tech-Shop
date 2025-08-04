@@ -8,7 +8,9 @@ import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class ProductTechPage extends StatefulWidget {
-  const ProductTechPage({super.key});
+  final bool isLoggedIn;
+
+  const ProductTechPage({super.key, required this.isLoggedIn});
 
   @override
   State<ProductTechPage> createState() => _ProductTechPageState();
@@ -360,7 +362,10 @@ class _ProductTechPageState extends State<ProductTechPage>
                 children: [
                   // AppBar-style header
                   // 🔵 HEADER: Back, Search, Filter
-                  TechHeader(onFilterTap: _openFilterDialog),
+                  TechHeader(
+                    onFilterTap: _openFilterDialog,
+                    isLoggedIn: widget.isLoggedIn,
+                  ),
                   // 🔽 SORT OPTIONS (Horizontal Row)
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -408,7 +413,10 @@ class _ProductTechPageState extends State<ProductTechPage>
                             columnCount: 2,
                             child: ScaleAnimation(
                               child: FadeInAnimation(
-                                child: ProductCardHoverEffect(product: product),
+                                child: ProductCardHoverEffect(
+                                  product: product,
+                                  isLoggedIn: widget.isLoggedIn,
+                                ),
                               ),
                             ),
                           );
@@ -481,9 +489,15 @@ class _ProductTechPageState extends State<ProductTechPage>
 }
 
 class TechHeader extends StatelessWidget {
+  final bool isLoggedIn;
+
   final VoidCallback onFilterTap;
 
-  const TechHeader({super.key, required this.onFilterTap});
+  const TechHeader({
+    super.key,
+    required this.onFilterTap,
+    required this.isLoggedIn,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -507,11 +521,13 @@ class TechHeader extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+            icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const LayoutPage()),
+                MaterialPageRoute(
+                  builder: (_) => LayoutPage(isLoggedIn: isLoggedIn),
+                ),
               );
             },
           ),

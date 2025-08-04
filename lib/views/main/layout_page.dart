@@ -1,12 +1,12 @@
-// ignore_for_file: deprecated_member_use, duplicate_ignore
+// ignore_for_file: deprecated_member_use, duplicate_ignore, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tech_fun/components/DrawerMenuItem.dart';
 import 'package:tech_fun/components/animatedsearchnar.dart';
 import 'package:tech_fun/components/user_avatar.dart';
-import 'package:tech_fun/utils/store_credential.dart';
 import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
 import 'package:tech_fun/views/bottom_view/my_store_page.dart';
 import 'package:tech_fun/views/bottom_view/post_page.dart';
@@ -17,14 +17,14 @@ import 'package:tech_fun/views/mid/product_tech_page.dart';
 import 'package:tech_fun/views/mid/profile_page.dart';
 
 class LayoutPage extends StatefulWidget {
-  const LayoutPage({super.key});
+  late bool isLoggedIn;
+  LayoutPage({super.key, required this.isLoggedIn});
 
   @override
   State<LayoutPage> createState() => _LayoutPageState();
 }
 
 class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
-  late bool loggedIn = false;
   late Color currentColor;
   final String userName = "John Doe";
   final String userRank = "Gold";
@@ -48,6 +48,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
     _bgController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
@@ -69,11 +70,6 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
     ).animate(_bgController);
 
     currentColor = Colors.white;
-    setLogin();
-  }
-
-  Future<void> setLogin() async {
-    loggedIn = await isLoggedIn();
   }
 
   @override
@@ -84,10 +80,10 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
   }
 
   /// widget list
-  final List<Widget> bottomBarPages = [
+  late List<Widget> bottomBarPages = [
     PostPage(),
     CommunityChatPage(),
-    MyStorePage(),
+    MyStorePage(isLoggedIn: widget.isLoggedIn),
   ];
 
   @override
@@ -257,7 +253,8 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProductTechPage(),
+                    builder: (context) =>
+                        ProductTechPage(isLoggedIn: widget.isLoggedIn),
                   ),
                 );
               }),
@@ -265,14 +262,20 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const NewsPage()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        NewsPage(isLoggedIn: widget.isLoggedIn),
+                  ),
                 );
               }),
               DrawerMenuItem("Events", () {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const EventPage()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        EventPage(isLoggedIn: widget.isLoggedIn),
+                  ),
                 );
               }),
 
@@ -281,7 +284,10 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ProfilePage(isLoggedIn: widget.isLoggedIn),
+                  ),
                 );
               }),
               // Search Input
@@ -300,7 +306,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
               // Login/Register or Avatar
               Padding(
                 padding: EdgeInsets.all(16),
-                child: loggedIn
+                child: widget.isLoggedIn
                     ? UserAvatar(
                         name: userName,
                         rank: userRank,
@@ -314,7 +320,8 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const InformPage(),
+                                  builder: (context) =>
+                                      InformPage(isLoggedIn: widget.isLoggedIn),
                                 ),
                               );
                             });
@@ -388,9 +395,11 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
               ),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                logout();
+              onPressed: () async {
+                widget.isLoggedIn = false;
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear(); // or remove 'isLoggedIn'
+                Navigator.of(context).pop();
               },
               child: Text(
                 "Yes, I'll leave",

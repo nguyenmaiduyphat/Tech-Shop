@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:tech_fun/views/mid/product_detail_page.dart';
 
 class ProductCardHoverEffect extends StatefulWidget {
+  final bool isLoggedIn;
   final Map<String, dynamic> product;
 
-  const ProductCardHoverEffect({super.key, required this.product});
+  const ProductCardHoverEffect({
+    super.key,
+    required this.product,
+    required this.isLoggedIn,
+  });
 
   @override
   State<ProductCardHoverEffect> createState() => _ProductCardHoverEffectState();
@@ -54,8 +59,10 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    ProductDetailPage(imageGallery: widget.product['image']),
+                builder: (context) => ProductDetailPage(
+                  imageGallery: widget.product['image'],
+                  isLoggedIn: widget.isLoggedIn,
+                ),
               ),
             );
           },

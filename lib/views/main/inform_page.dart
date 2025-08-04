@@ -1,14 +1,15 @@
-// ignore_for_file: non_constant_identifier_names, sized_box_for_whitespace, use_super_parameters
+// ignore_for_file: non_constant_identifier_names, sized_box_for_whitespace, use_super_parameters, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:tech_fun/utils/store_credential.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class InformPage extends StatefulWidget {
-  const InformPage({super.key});
+  late bool isLoggedIn;
+  InformPage({super.key, required this.isLoggedIn});
 
   @override
   State<InformPage> createState() => _InformPageState();
@@ -114,7 +115,10 @@ class _InformPageState extends State<InformPage> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const LayoutPage()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        LayoutPage(isLoggedIn: widget.isLoggedIn),
+                  ),
                 );
               },
             ),
@@ -274,15 +278,19 @@ class _InformPageState extends State<InformPage> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    onPressed: () {
-                      login(
+                    onPressed: () async {
+                      widget.isLoggedIn = true;
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool('isLoggedIn', true);
+                      await prefs.setString(
+                        'username',
                         _usernamecontroller_login.text,
-                        _passwordcontroller_login.text,
                       );
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const LayoutPage(),
+                          builder: (context) =>
+                              LayoutPage(isLoggedIn: widget.isLoggedIn),
                         ),
                       );
                     },
@@ -520,10 +528,6 @@ class _InformPageState extends State<InformPage> {
 
                       if (_passwordcontroller_register.text.trim() ==
                           _confirmpasswordcontroller_register.text.trim()) {
-                        register(
-                          _usernamecontroller_register.text,
-                          _passwordcontroller_register.text,
-                        );
                         _goToLogin();
                       }
                     } else {

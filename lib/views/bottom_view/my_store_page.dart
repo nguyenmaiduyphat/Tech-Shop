@@ -11,7 +11,9 @@ import 'package:tech_fun/views/mid/product_detail_page.dart';
 import 'package:tech_fun/views/mid/product_store_page.dart';
 
 class MyStorePage extends StatefulWidget {
-  const MyStorePage({super.key});
+  final bool isLoggedIn;
+
+  const MyStorePage({super.key, required this.isLoggedIn});
 
   @override
   State<MyStorePage> createState() => _MyStorePageState();
@@ -105,7 +107,8 @@ class _MyStorePageState extends State<MyStorePage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProductStorePage(),
+                    builder: (context) =>
+                        ProductStorePage(isLoggedIn: widget.isLoggedIn),
                   ),
                 );
               }),
@@ -117,7 +120,10 @@ class _MyStorePageState extends State<MyStorePage> {
               _buildSectionTitle('Your Posts', () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => PostStorePage()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PostStorePage(isLoggedIn: widget.isLoggedIn),
+                  ),
                 );
               }),
               _buildPostList(posts, emptyMessage: 'No posts yet'),
@@ -128,7 +134,10 @@ class _MyStorePageState extends State<MyStorePage> {
               _buildSectionTitle('Products Bought', () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => ProductBoughtPage()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ProductBoughtPage(isLoggedIn: widget.isLoggedIn),
+                  ),
                 );
               }),
               _buildProductList(
@@ -394,8 +403,10 @@ class _MyStorePageState extends State<MyStorePage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          ProductDetailPage(imageGallery: item['image']),
+                      builder: (context) => ProductDetailPage(
+                        imageGallery: item['image'],
+                        isLoggedIn: widget.isLoggedIn,
+                      ),
                     ),
                   );
                 },
@@ -413,7 +424,9 @@ class _MyStorePageState extends State<MyStorePage> {
       ).showSnackBar(const SnackBar(content: Text('Edit clicked')));
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => EditProductPage()),
+        MaterialPageRoute(
+          builder: (context) => EditProductPage(isLoggedIn: widget.isLoggedIn),
+        ),
       );
     } else if (result == 'view') {
       ScaffoldMessenger.of(

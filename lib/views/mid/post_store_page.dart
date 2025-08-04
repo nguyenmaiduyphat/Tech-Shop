@@ -5,7 +5,9 @@ import 'package:tech_fun/models/post_info.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class PostStorePage extends StatefulWidget {
-  const PostStorePage({super.key});
+  final bool isLoggedIn;
+
+  const PostStorePage({super.key, required this.isLoggedIn});
 
   @override
   _MyPostsPageState createState() => _MyPostsPageState();
@@ -237,7 +239,10 @@ class _MyPostsPageState extends State<PostStorePage> {
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => LayoutPage()),
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              LayoutPage(isLoggedIn: widget.isLoggedIn),
+                        ),
                       );
                     },
                   ),

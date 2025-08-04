@@ -22,7 +22,9 @@ class Product {
 }
 
 class ProductStorePage extends StatefulWidget {
-  const ProductStorePage({super.key});
+  final bool isLoggedIn;
+
+  const ProductStorePage({super.key, required this.isLoggedIn});
 
   @override
   State<ProductStorePage> createState() => _ProductStorePageState();
@@ -341,7 +343,10 @@ class _ProductStorePageState extends State<ProductStorePage> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => LayoutPage()),
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            LayoutPage(isLoggedIn: widget.isLoggedIn),
+                      ),
                     );
                   },
                 ),
