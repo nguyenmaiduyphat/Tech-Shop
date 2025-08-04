@@ -5,7 +5,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'dart:math';
 
 import 'package:tech_fun/views/main/layout_page.dart';
-import 'package:tech_fun/views/mid_view/event_detail_page.dart';
+import 'package:tech_fun/views/mid/event_detail_page.dart';
 
 class EventPage extends StatefulWidget {
   const EventPage({super.key});

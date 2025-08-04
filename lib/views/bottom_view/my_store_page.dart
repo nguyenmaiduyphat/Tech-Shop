@@ -1,12 +1,12 @@
 import 'dart:ui';
 import 'package:animation_list/animation_list.dart';
 import 'package:flutter/material.dart';
-import 'package:tech_fun/views/mid_view/edit_product_page.dart';
-import 'package:tech_fun/views/mid_view/post_detail_page.dart';
-import 'package:tech_fun/views/mid_view/post_store_page.dart';
-import 'package:tech_fun/views/mid_view/product_bought_page.dart';
-import 'package:tech_fun/views/mid_view/product_detail_page.dart';
-import 'package:tech_fun/views/mid_view/product_store_page.dart';
+import 'package:tech_fun/views/mid/edit_product_page.dart';
+import 'package:tech_fun/views/mid/post_detail_page.dart';
+import 'package:tech_fun/views/mid/post_store_page.dart';
+import 'package:tech_fun/views/mid/product_bought_page.dart';
+import 'package:tech_fun/views/mid/product_detail_page.dart';
+import 'package:tech_fun/views/mid/product_store_page.dart';
 
 class MyStorePage extends StatefulWidget {
   const MyStorePage({super.key});

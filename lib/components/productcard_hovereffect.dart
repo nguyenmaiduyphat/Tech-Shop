@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tech_fun/views/mid_view/product_detail_page.dart';
+import 'package:tech_fun/views/mid/product_detail_page.dart';
 
 class ProductCardHoverEffect extends StatefulWidget {
   final Map<String, dynamic> product;

@@ -5,7 +5,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'dart:math';
 
 import 'package:tech_fun/views/main/layout_page.dart';
-import 'package:tech_fun/views/mid_view/news_detail_page.dart';
+import 'package:tech_fun/views/mid/news_detail_page.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});

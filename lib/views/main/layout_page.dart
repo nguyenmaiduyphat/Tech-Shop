@@ -8,10 +8,10 @@ import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
 import 'package:tech_fun/views/bottom_view/my_store_page.dart';
 import 'package:tech_fun/views/bottom_view/post_page.dart';
 import 'package:tech_fun/views/main/inform_page.dart';
-import 'package:tech_fun/views/mid_view/event_page.dart';
-import 'package:tech_fun/views/mid_view/news_page.dart';
-import 'package:tech_fun/views/mid_view/product_tech_page.dart';
-import 'package:tech_fun/views/mid_view/profile_page.dart';
+import 'package:tech_fun/views/mid/event_page.dart';
+import 'package:tech_fun/views/mid/news_page.dart';
+import 'package:tech_fun/views/mid/product_tech_page.dart';
+import 'package:tech_fun/views/mid/profile_page.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({super.key});

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
-import 'package:tech_fun/views/mid_view/product_detail_page.dart';
+import 'package:tech_fun/views/mid/product_detail_page.dart';
 
 class ProductTechPage extends StatefulWidget {
   const ProductTechPage({super.key});
