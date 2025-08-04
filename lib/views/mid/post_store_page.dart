@@ -1,8 +1,12 @@
+// ignore_for_file: library_private_types_in_public_api, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:tech_fun/models/post_info.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class PostStorePage extends StatefulWidget {
+  const PostStorePage({super.key});
+
   @override
   _MyPostsPageState createState() => _MyPostsPageState();
 }

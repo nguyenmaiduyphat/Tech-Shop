@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -265,8 +267,7 @@ class _ProductStorePageState extends State<ProductStorePage> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
                                         product.name.length > 20
-                                            ? product.name.substring(0, 20) +
-                                                  '...'
+                                            ? '${product.name.substring(0, 20)}...'
                                             : product.name,
                                         style: const TextStyle(
                                           color: Colors.white70,
@@ -318,12 +319,7 @@ class _ProductStorePageState extends State<ProductStorePage> {
                                           Icons.edit,
                                           color: Colors.orangeAccent,
                                         ),
-                                        onPressed: () {
-                                          // TODO: Add edit logic here
-                                          print(
-                                            'Edit pressed for ${product.name}',
-                                          );
-                                        },
+                                        onPressed: () {},
                                       ),
                                     ),
                                   ),
@@ -343,7 +339,6 @@ class _ProductStorePageState extends State<ProductStorePage> {
                 child: IconButton(
                   icon: const Icon(Icons.home, color: Colors.white, size: 35),
                   onPressed: () {
-                    // TODO: Add home navigation logic
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => LayoutPage()),

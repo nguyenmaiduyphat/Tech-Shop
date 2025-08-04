@@ -8,6 +8,7 @@ class AnimatedGradientDialogContent extends StatefulWidget {
   final String nameUser;
 
   const AnimatedGradientDialogContent({
+    super.key,
     required this.reasonController,
     required this.gradientList,
     required this.onSubmit,

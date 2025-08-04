@@ -130,7 +130,6 @@ class _PostPageState extends State<PostPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     for (PostInfo postInfo in postInfos) {

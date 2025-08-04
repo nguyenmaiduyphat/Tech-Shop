@@ -1,7 +1,10 @@
+// ignore_for_file: non_constant_identifier_names, sized_box_for_whitespace, use_super_parameters
+
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:tech_fun/utils/store_credential.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class InformPage extends StatefulWidget {
@@ -15,9 +18,40 @@ enum LoginSubPage { login, forgotPassword }
 
 class _InformPageState extends State<InformPage> {
   final PageController _pageController = PageController();
+
+  final TextEditingController _usernamecontroller_login = TextEditingController(
+    text: '',
+  );
+  final TextEditingController _passwordcontroller_login = TextEditingController(
+    text: '',
+  );
+  final TextEditingController _usernamecontroller_register =
+      TextEditingController(text: '');
+  final TextEditingController _passwordcontroller_register =
+      TextEditingController(text: '');
+  final TextEditingController _confirmpasswordcontroller_register =
+      TextEditingController(text: '');
+  final TextEditingController _emailcontroller_register = TextEditingController(
+    text: '',
+  );
+  final TextEditingController _phonecontroller_register = TextEditingController(
+    text: '',
+  );
+  final TextEditingController _addresscontroller_register =
+      TextEditingController(text: '');
+  final TextEditingController _birthcontroller_register = TextEditingController(
+    text: '',
+  );
+  final TextEditingController _ciccontroller_register = TextEditingController(
+    text: '',
+  );
+  final TextEditingController _bankcontroller_register = TextEditingController(
+    text: '',
+  );
+
   bool isLoginPage = true;
   bool readPolicy = false;
-  String? selectedGender;
+  String? selectedGender = "Male";
   LoginSubPage loginSubPage = LoginSubPage.login; // new
 
   void _goToRegister() {
@@ -212,6 +246,7 @@ class _InformPageState extends State<InformPage> {
               SlideInFromLeft(
                 delay: const Duration(milliseconds: 100),
                 child: _buildTextField(
+                  controller: _usernamecontroller_login,
                   label: 'Username',
                   icon: Icons.person_outline,
                 ),
@@ -220,6 +255,7 @@ class _InformPageState extends State<InformPage> {
               SlideInFromLeft(
                 delay: const Duration(milliseconds: 200),
                 child: _buildTextField(
+                  controller: _passwordcontroller_login,
                   label: 'Password',
                   icon: Icons.lock_outline,
                   obscure: true,
@@ -238,7 +274,18 @@ class _InformPageState extends State<InformPage> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      login(
+                        _usernamecontroller_login.text,
+                        _passwordcontroller_login.text,
+                      );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LayoutPage(),
+                        ),
+                      );
+                    },
                     child: const Text(
                       "Login",
                       style: TextStyle(
@@ -326,7 +373,11 @@ class _InformPageState extends State<InformPage> {
         children: [
           SlideInFromLeft(
             delay: const Duration(milliseconds: 100),
-            child: _buildTextField(label: 'Username', icon: Icons.person),
+            child: _buildTextField(
+              label: 'Username',
+              icon: Icons.person,
+              controller: _usernamecontroller_register,
+            ),
           ),
           SlideInFromLeft(
             delay: const Duration(milliseconds: 200),
@@ -334,6 +385,7 @@ class _InformPageState extends State<InformPage> {
               label: 'Password',
               icon: Icons.lock,
               obscure: true,
+              controller: _passwordcontroller_register,
             ),
           ),
           SlideInFromLeft(
@@ -342,19 +394,32 @@ class _InformPageState extends State<InformPage> {
               label: 'Confirm Password',
               icon: Icons.lock_outline,
               obscure: true,
+              controller: _confirmpasswordcontroller_register,
             ),
           ),
           SlideInFromLeft(
             delay: const Duration(milliseconds: 400),
-            child: _buildTextField(label: 'Email', icon: Icons.email),
+            child: _buildTextField(
+              label: 'Email',
+              icon: Icons.email,
+              controller: _emailcontroller_register,
+            ),
           ),
           SlideInFromLeft(
             delay: const Duration(milliseconds: 500),
-            child: _buildTextField(label: 'Phone Number', icon: Icons.phone),
+            child: _buildTextField(
+              label: 'Phone Number',
+              icon: Icons.phone,
+              controller: _phonecontroller_register,
+            ),
           ),
           SlideInFromLeft(
             delay: const Duration(milliseconds: 600),
-            child: _buildTextField(label: 'Address', icon: Icons.home),
+            child: _buildTextField(
+              label: 'Address',
+              icon: Icons.home,
+              controller: _addresscontroller_register,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -379,6 +444,7 @@ class _InformPageState extends State<InformPage> {
             child: _buildTextField(
               label: 'Birthdate (YYYY-MM-DD)',
               icon: Icons.date_range,
+              controller: _birthcontroller_register,
             ),
           ),
           SlideInFromLeft(
@@ -386,6 +452,7 @@ class _InformPageState extends State<InformPage> {
             child: _buildTextField(
               label: 'Citizen Identification Card',
               icon: Icons.credit_card,
+              controller: _ciccontroller_register,
             ),
           ),
           SlideInFromLeft(
@@ -393,6 +460,7 @@ class _InformPageState extends State<InformPage> {
             child: _buildTextField(
               label: 'Bank Account',
               icon: Icons.account_balance,
+              controller: _bankcontroller_register,
             ),
           ),
 
@@ -433,7 +501,31 @@ class _InformPageState extends State<InformPage> {
                   ),
                   onPressed: () {
                     if (readPolicy) {
-                      // Register logic
+                      if (_usernamecontroller_register.text.isEmpty ||
+                          _passwordcontroller_register.text.isEmpty ||
+                          _confirmpasswordcontroller_register.text.isEmpty ||
+                          _emailcontroller_register.text.isEmpty ||
+                          _phonecontroller_register.text.isEmpty ||
+                          _addresscontroller_register.text.isEmpty ||
+                          _birthcontroller_register.text.isEmpty ||
+                          _ciccontroller_register.text.isEmpty ||
+                          _bankcontroller_register.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("You must fill all fields are empty"),
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (_passwordcontroller_register.text.trim() ==
+                          _confirmpasswordcontroller_register.text.trim()) {
+                        register(
+                          _usernamecontroller_register.text,
+                          _passwordcontroller_register.text,
+                        );
+                        _goToLogin();
+                      }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -494,10 +586,12 @@ class _InformPageState extends State<InformPage> {
     required String label,
     IconData? icon,
     bool obscure = false,
+    required TextEditingController? controller,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
+        controller: controller,
         cursorColor: const Color.fromARGB(255, 14, 167, 134),
         obscureText: obscure,
         style: const TextStyle(color: Colors.white),

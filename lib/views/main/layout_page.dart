@@ -1,9 +1,12 @@
+// ignore_for_file: deprecated_member_use, duplicate_ignore
+
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tech_fun/components/DrawerMenuItem.dart';
 import 'package:tech_fun/components/animatedsearchnar.dart';
 import 'package:tech_fun/components/user_avatar.dart';
+import 'package:tech_fun/utils/store_credential.dart';
 import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
 import 'package:tech_fun/views/bottom_view/my_store_page.dart';
 import 'package:tech_fun/views/bottom_view/post_page.dart';
@@ -21,7 +24,7 @@ class LayoutPage extends StatefulWidget {
 }
 
 class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
-  bool loggedIn = false;
+  late bool loggedIn = false;
   late Color currentColor;
   final String userName = "John Doe";
   final String userRank = "Gold";
@@ -37,12 +40,6 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
 
   bool showSearchBar = false;
 
-  void _closeSearchBar([String? value]) {
-    setState(() {
-      showSearchBar = false;
-    });
-  }
-
   late AnimationController _bgController;
   late Animation<Color?> _color1;
   late Animation<Color?> _color2;
@@ -50,7 +47,6 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _bgController = AnimationController(
       vsync: this,
@@ -73,6 +69,11 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
     ).animate(_bgController);
 
     currentColor = Colors.white;
+    setLogin();
+  }
+
+  Future<void> setLogin() async {
+    loggedIn = await isLoggedIn();
   }
 
   @override
@@ -287,6 +288,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: AnimatedSearchBar(
+                  // ignore: avoid_types_as_parameter_names, non_constant_identifier_names
                   onSubmitted: (String) {
                     Navigator.pop(context);
                   },
@@ -302,9 +304,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                     ? UserAvatar(
                         name: userName,
                         rank: userRank,
-                        onTap: () {
-                          setState(() {});
-                        },
+                        onTap: () => _showLogoutDialog(context),
                       )
                     : Center(
                         child: ElevatedButton(
@@ -359,6 +359,51 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
     );
   }
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.black87,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.music_note, color: Colors.purpleAccent),
+              SizedBox(width: 10),
+              Text("Log Out", style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          content: Text(
+            "Do you want to log out?",
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // NO
+              child: Text(
+                "No, I stay",
+                style: TextStyle(color: Colors.grey[400]),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+                logout();
+              },
+              child: Text(
+                "Yes, I'll leave",
+                style: TextStyle(color: Colors.purpleAccent),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ignore: non_constant_identifier_names
   Widget _LogoText({Key? key}) {
     return Row(
       key: key,

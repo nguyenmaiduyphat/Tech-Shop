@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
@@ -20,6 +22,8 @@ class BoughtProduct {
 }
 
 class ProductBoughtPage extends StatelessWidget {
+  ProductBoughtPage({super.key});
+
   final List<BoughtProduct> boughtProducts = [
     BoughtProduct(
       name: 'Noise-Cancelling Headphones',

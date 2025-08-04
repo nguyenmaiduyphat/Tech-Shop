@@ -5,7 +5,7 @@ import 'package:tech_fun/views/mid/product_detail_page.dart';
 class ProductCardHoverEffect extends StatefulWidget {
   final Map<String, dynamic> product;
 
-  const ProductCardHoverEffect({required this.product});
+  const ProductCardHoverEffect({super.key, required this.product});
 
   @override
   State<ProductCardHoverEffect> createState() => _ProductCardHoverEffectState();

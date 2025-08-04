@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:ui';
 import 'package:animation_list/animation_list.dart';
 import 'package:flutter/material.dart';
@@ -406,7 +408,6 @@ class _MyStorePageState extends State<MyStorePage> {
         list.removeAt(index);
       });
     } else if (result == 'edit') {
-      // TODO: Show your edit logic here
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Edit clicked')));
@@ -415,7 +416,6 @@ class _MyStorePageState extends State<MyStorePage> {
         MaterialPageRoute(builder: (context) => EditProductPage()),
       );
     } else if (result == 'view') {
-      // TODO: Navigate or show detail here
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('View Detail clicked')));

@@ -1,11 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
-import 'package:tech_fun/views/mid/product_detail_page.dart';
 
 class ProductTechPage extends StatefulWidget {
   const ProductTechPage({super.key});
@@ -308,7 +308,6 @@ class _ProductTechPageState extends State<ProductTechPage>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _bgController = AnimationController(
       vsync: this,
@@ -526,7 +525,7 @@ class TechHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const TextField(
-                cursorColor: const Color.fromARGB(255, 14, 167, 134),
+                cursorColor: Color.fromARGB(255, 14, 167, 134),
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   icon: Icon(Icons.search, color: Colors.white70),

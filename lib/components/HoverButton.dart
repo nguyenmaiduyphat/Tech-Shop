@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 class HoverButton extends StatefulWidget {
@@ -7,6 +9,7 @@ class HoverButton extends StatefulWidget {
   final VoidCallback onPressed;
 
   const HoverButton({
+    super.key,
     required this.label,
     required this.color,
     required this.hoverColor,

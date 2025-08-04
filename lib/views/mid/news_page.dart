@@ -1,9 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'dart:math';
-
 import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/news_detail_page.dart';
 
@@ -153,7 +153,7 @@ class _NewsPageState extends State<NewsPage>
   }
 
   LinearGradient get techGradient => LinearGradient(
-    colors: [const Color.fromARGB(255, 0, 8, 121)!, Colors.blueGrey[600]!],
+    colors: [const Color.fromARGB(255, 0, 8, 121), Colors.blueGrey[600]!],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

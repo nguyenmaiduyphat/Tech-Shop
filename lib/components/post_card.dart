@@ -1,10 +1,7 @@
-import 'dart:ui';
+// ignore_for_file: must_be_immutable, unused_element, deprecated_member_use, no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:galleryimage/galleryimage.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:tech_fun/components/HoverButton.dart';
 import 'package:tech_fun/components/animated_gradient_dialog_content.dart';
 import 'package:tech_fun/components/assetgallery.dart';
 import 'package:tech_fun/components/commentsection.dart';
@@ -38,7 +35,6 @@ class _PostCardState extends State<PostCard> {
   bool hasLoad = false;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     commentsNotifier.value = List.from(widget.postInfo.comments);
 
@@ -317,14 +313,13 @@ class _PostCardState extends State<PostCard> {
   }
 
   void _submitReport(String reason) {
-    // Gửi lên server hoặc log ra
-    print(
-      'Report submitted:\nUser: ${widget.postInfo.nameUser}\nReason: $reason',
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Report submitted:\nUser: ${widget.postInfo.nameUser}\nReason: $reason',
+        ),
+      ),
     );
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Report submitted')));
   }
 
   Widget _buildImagePreview(String image) {
