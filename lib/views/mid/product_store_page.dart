@@ -22,9 +22,7 @@ class Product {
 }
 
 class ProductStorePage extends StatefulWidget {
-  final bool isLoggedIn;
-
-  const ProductStorePage({super.key, required this.isLoggedIn});
+  const ProductStorePage({super.key});
 
   @override
   State<ProductStorePage> createState() => _ProductStorePageState();
@@ -345,7 +343,7 @@ class _ProductStorePageState extends State<ProductStorePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            LayoutPage(isLoggedIn: widget.isLoggedIn),
+                            LayoutPage(),
                       ),
                     );
                   },

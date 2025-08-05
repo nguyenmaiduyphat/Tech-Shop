@@ -2,14 +2,14 @@
 
 import 'dart:async';
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class InformPage extends StatefulWidget {
-  late bool isLoggedIn;
-  InformPage({super.key, required this.isLoggedIn});
+  InformPage({super.key});
 
   @override
   State<InformPage> createState() => _InformPageState();
@@ -115,10 +115,7 @@ class _InformPageState extends State<InformPage> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        LayoutPage(isLoggedIn: widget.isLoggedIn),
-                  ),
+                  MaterialPageRoute(builder: (context) => LayoutPage()),
                 );
               },
             ),
@@ -279,19 +276,42 @@ class _InformPageState extends State<InformPage> {
                       ),
                     ),
                     onPressed: () async {
-                      widget.isLoggedIn = true;
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setBool('isLoggedIn', true);
-                      await prefs.setString(
-                        'username',
-                        _usernamecontroller_login.text,
+                      if (_usernamecontroller_login.text.contains(
+                        '@gmail.com',
+                      )) {
+                        if (_usernamecontroller_login.text.split("@")[1] !=
+                            "gmail.com") {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "After @ of email must be gmail.com",
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Your email must be email (@gmail.com)",
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+                      // Login Success
+                      setState(() {
+                        SecureStorageService.currentUser =
+                            _usernamecontroller_login.text;
+                      });
+                      await SecureStorageService.save(
+                        SecureStorageService.keyName,
+                        SecureStorageService.currentUser,
                       );
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              LayoutPage(isLoggedIn: widget.isLoggedIn),
-                        ),
+                        MaterialPageRoute(builder: (context) => LayoutPage()),
                       );
                     },
                     child: const Text(
@@ -507,7 +527,7 @@ class _InformPageState extends State<InformPage> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (readPolicy) {
                       if (_usernamecontroller_register.text.isEmpty ||
                           _passwordcontroller_register.text.isEmpty ||
@@ -526,9 +546,48 @@ class _InformPageState extends State<InformPage> {
                         return;
                       }
 
+                      if (_emailcontroller_register.text.contains(
+                        '@gmail.com',
+                      )) {
+                        if (_emailcontroller_register.text.split("@")[1] !=
+                            "gmail.com") {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "After @ of email must be gmail.com",
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Your email must be email (@gmail.com)",
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
                       if (_passwordcontroller_register.text.trim() ==
                           _confirmpasswordcontroller_register.text.trim()) {
+                        await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                              email: _emailcontroller_register.text,
+                              password: _passwordcontroller_register.text,
+                            );
                         _goToLogin();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Password and Confirm password are not matched",
+                            ),
+                          ),
+                        );
+                        return;
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(

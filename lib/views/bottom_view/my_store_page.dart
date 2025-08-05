@@ -11,9 +11,8 @@ import 'package:tech_fun/views/mid/product_detail_page.dart';
 import 'package:tech_fun/views/mid/product_store_page.dart';
 
 class MyStorePage extends StatefulWidget {
-  final bool isLoggedIn;
 
-  const MyStorePage({super.key, required this.isLoggedIn});
+  const MyStorePage({super.key});
 
   @override
   State<MyStorePage> createState() => _MyStorePageState();
@@ -108,7 +107,7 @@ class _MyStorePageState extends State<MyStorePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        ProductStorePage(isLoggedIn: widget.isLoggedIn),
+                        ProductStorePage(),
                   ),
                 );
               }),
@@ -122,7 +121,7 @@ class _MyStorePageState extends State<MyStorePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        PostStorePage(isLoggedIn: widget.isLoggedIn),
+                        PostStorePage(),
                   ),
                 );
               }),
@@ -136,7 +135,7 @@ class _MyStorePageState extends State<MyStorePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        ProductBoughtPage(isLoggedIn: widget.isLoggedIn),
+                        ProductBoughtPage(),
                   ),
                 );
               }),
@@ -405,7 +404,6 @@ class _MyStorePageState extends State<MyStorePage> {
                     MaterialPageRoute(
                       builder: (context) => ProductDetailPage(
                         imageGallery: item['image'],
-                        isLoggedIn: widget.isLoggedIn,
                       ),
                     ),
                   );
@@ -425,7 +423,7 @@ class _MyStorePageState extends State<MyStorePage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => EditProductPage(isLoggedIn: widget.isLoggedIn),
+          builder: (context) => EditProductPage(),
         ),
       );
     } else if (result == 'view') {

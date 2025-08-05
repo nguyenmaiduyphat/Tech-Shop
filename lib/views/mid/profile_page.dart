@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  final bool isLoggedIn;
 
-  const ProfilePage({super.key, required this.isLoggedIn});
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -173,7 +172,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        LayoutPage(isLoggedIn: widget.isLoggedIn),
+                        LayoutPage(),
                   ),
                 );
               },

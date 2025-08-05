@@ -8,9 +8,8 @@ import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class ProductTechPage extends StatefulWidget {
-  final bool isLoggedIn;
 
-  const ProductTechPage({super.key, required this.isLoggedIn});
+  const ProductTechPage({super.key});
 
   @override
   State<ProductTechPage> createState() => _ProductTechPageState();
@@ -364,7 +363,6 @@ class _ProductTechPageState extends State<ProductTechPage>
                   // 🔵 HEADER: Back, Search, Filter
                   TechHeader(
                     onFilterTap: _openFilterDialog,
-                    isLoggedIn: widget.isLoggedIn,
                   ),
                   // 🔽 SORT OPTIONS (Horizontal Row)
                   Container(
@@ -415,7 +413,6 @@ class _ProductTechPageState extends State<ProductTechPage>
                               child: FadeInAnimation(
                                 child: ProductCardHoverEffect(
                                   product: product,
-                                  isLoggedIn: widget.isLoggedIn,
                                 ),
                               ),
                             ),
@@ -489,14 +486,12 @@ class _ProductTechPageState extends State<ProductTechPage>
 }
 
 class TechHeader extends StatelessWidget {
-  final bool isLoggedIn;
 
   final VoidCallback onFilterTap;
 
   const TechHeader({
     super.key,
     required this.onFilterTap,
-    required this.isLoggedIn,
   });
 
   @override
@@ -526,7 +521,7 @@ class TechHeader extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => LayoutPage(isLoggedIn: isLoggedIn),
+                  builder: (_) => LayoutPage(),
                 ),
               );
             },

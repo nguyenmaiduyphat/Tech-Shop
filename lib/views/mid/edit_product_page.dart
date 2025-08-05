@@ -8,8 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class EditProductPage extends StatefulWidget {
-  final bool isLoggedIn;
-  const EditProductPage({super.key, required this.isLoggedIn});
+  const EditProductPage({super.key});
 
   @override
   State<EditProductPage> createState() => _EditProductPageState();
@@ -112,7 +111,7 @@ class _EditProductPageState extends State<EditProductPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          LayoutPage(isLoggedIn: widget.isLoggedIn),
+                          LayoutPage(),
                     ),
                   );
                 },

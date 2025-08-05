@@ -8,9 +8,8 @@ import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/news_detail_page.dart';
 
 class NewsPage extends StatefulWidget {
-  final bool isLoggedIn;
 
-  const NewsPage({super.key, required this.isLoggedIn});
+  const NewsPage({super.key});
 
   @override
   State<NewsPage> createState() => _NewsPageState();
@@ -198,7 +197,7 @@ class _NewsPageState extends State<NewsPage>
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    LayoutPage(isLoggedIn: widget.isLoggedIn),
+                                    LayoutPage(),
                               ),
                             );
                           },
@@ -309,7 +308,6 @@ class _NewsPageState extends State<NewsPage>
                                     description: news['description']!,
                                     image: news['image']!,
                                     gradient: techGradient,
-                                    isLoggedIn: widget.isLoggedIn,
                                   ),
                                 ),
                               ),
@@ -334,7 +332,6 @@ class NewsCard extends StatelessWidget {
   final String description;
   final String image;
   final Gradient gradient;
-  final bool isLoggedIn;
 
   const NewsCard({
     super.key,
@@ -342,7 +339,6 @@ class NewsCard extends StatelessWidget {
     required this.description,
     required this.image,
     required this.gradient,
-    required this.isLoggedIn,
   });
 
   @override
@@ -352,7 +348,7 @@ class NewsCard extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => NewsDetailPage(isLoggedIn: isLoggedIn),
+            builder: (context) => NewsDetailPage(),
           ),
         );
       },

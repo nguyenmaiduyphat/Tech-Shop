@@ -9,9 +9,8 @@ import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/event_detail_page.dart';
 
 class EventPage extends StatefulWidget {
-  final bool isLoggedIn;
 
-  const EventPage({super.key, required this.isLoggedIn});
+  const EventPage({super.key});
 
   @override
   State<EventPage> createState() => _EventPageState();
@@ -219,7 +218,7 @@ class _EventPageState extends State<EventPage>
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    LayoutPage(isLoggedIn: widget.isLoggedIn),
+                                    LayoutPage(),
                               ),
                             );
                           },
@@ -340,8 +339,7 @@ class _EventPageState extends State<EventPage>
                                                   EventDetailPage(
                                                     eventStatus:
                                                         event['status'],
-                                                    isLoggedIn:
-                                                        widget.isLoggedIn,
+                             
                                                   ),
                                             ),
                                           );

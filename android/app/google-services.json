@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44683766545",
+    "project_id": "techfun-22aa2",
+    "storage_bucket": "techfun-22aa2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44683766545:android:06c2b3002a2c65098ffab0",
+        "android_client_info": {
+          "package_name": "com.example.tech_fun"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLk1si5jStuJ7SOQrJbqAThp4xwJSVpss"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

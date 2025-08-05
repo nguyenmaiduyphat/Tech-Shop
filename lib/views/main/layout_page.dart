@@ -1,12 +1,13 @@
 // ignore_for_file: deprecated_member_use, duplicate_ignore, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tech_fun/components/DrawerMenuItem.dart';
 import 'package:tech_fun/components/animatedsearchnar.dart';
 import 'package:tech_fun/components/user_avatar.dart';
+import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
 import 'package:tech_fun/views/bottom_view/my_store_page.dart';
 import 'package:tech_fun/views/bottom_view/post_page.dart';
@@ -17,8 +18,7 @@ import 'package:tech_fun/views/mid/product_tech_page.dart';
 import 'package:tech_fun/views/mid/profile_page.dart';
 
 class LayoutPage extends StatefulWidget {
-  late bool isLoggedIn;
-  LayoutPage({super.key, required this.isLoggedIn});
+  const LayoutPage({super.key});
 
   @override
   State<LayoutPage> createState() => _LayoutPageState();
@@ -26,8 +26,6 @@ class LayoutPage extends StatefulWidget {
 
 class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
   late Color currentColor;
-  final String userName = "John Doe";
-  final String userRank = "Gold";
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _pageController = PageController(initialPage: 0);
 
@@ -39,7 +37,6 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
   int maxCount = 5;
 
   bool showSearchBar = false;
-
   late AnimationController _bgController;
   late Animation<Color?> _color1;
   late Animation<Color?> _color2;
@@ -48,7 +45,6 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
     _bgController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
@@ -70,6 +66,11 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
     ).animate(_bgController);
 
     currentColor = Colors.white;
+
+    
+    SecureStorageService.currentUser = SecureStorageService.read(
+      SecureStorageService.keyName,
+    ).toString();
   }
 
   @override
@@ -83,7 +84,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
   late List<Widget> bottomBarPages = [
     PostPage(),
     CommunityChatPage(),
-    MyStorePage(isLoggedIn: widget.isLoggedIn),
+    MyStorePage(),
   ];
 
   @override
@@ -252,30 +253,21 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ProductTechPage(isLoggedIn: widget.isLoggedIn),
-                  ),
+                  MaterialPageRoute(builder: (context) => ProductTechPage()),
                 );
               }),
               DrawerMenuItem("News", () {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        NewsPage(isLoggedIn: widget.isLoggedIn),
-                  ),
+                  MaterialPageRoute(builder: (context) => NewsPage()),
                 );
               }),
               DrawerMenuItem("Events", () {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        EventPage(isLoggedIn: widget.isLoggedIn),
-                  ),
+                  MaterialPageRoute(builder: (context) => EventPage()),
                 );
               }),
 
@@ -284,10 +276,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ProfilePage(isLoggedIn: widget.isLoggedIn),
-                  ),
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
                 );
               }),
               // Search Input
@@ -306,10 +295,12 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
               // Login/Register or Avatar
               Padding(
                 padding: EdgeInsets.all(16),
-                child: widget.isLoggedIn
+                child:
+                    SecureStorageService.currentUser.toString() !=
+                        SecureStorageService.offlineStatus.toString()
                     ? UserAvatar(
-                        name: userName,
-                        rank: userRank,
+                        name: SecureStorageService.currentUser,
+                        rank: 'Diamond',
                         onTap: () => _showLogoutDialog(context),
                       )
                     : Center(
@@ -320,8 +311,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      InformPage(isLoggedIn: widget.isLoggedIn),
+                                  builder: (context) => InformPage(),
                                 ),
                               );
                             });
@@ -396,10 +386,19 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
             ),
             TextButton(
               onPressed: () async {
-                widget.isLoggedIn = false;
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.clear(); // or remove 'isLoggedIn'
+                setState(() {
+                  SecureStorageService.currentUser =
+                      SecureStorageService.offlineStatus;
+                });
+                await SecureStorageService.save(
+                  SecureStorageService.keyName,
+                  SecureStorageService.currentUser,
+                );
                 Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => InformPage()),
+                );
               },
               child: Text(
                 "Yes, I'll leave",

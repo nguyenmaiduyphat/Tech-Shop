@@ -9,14 +9,12 @@ import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetailPage extends StatefulWidget {
-  final bool isLoggedIn;
 
   final List<String> imageGallery;
 
   const ProductDetailPage({
     super.key,
     required this.imageGallery,
-    required this.isLoggedIn,
   });
 
   @override
@@ -114,7 +112,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      LayoutPage(isLoggedIn: widget.isLoggedIn),
+                      LayoutPage(),
                 ),
               );
             },
@@ -722,7 +720,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             width: 160, // Width of each product card
             child: ProductCardHoverEffect(
               product: products[index],
-              isLoggedIn: widget.isLoggedIn,
             ),
           );
         },

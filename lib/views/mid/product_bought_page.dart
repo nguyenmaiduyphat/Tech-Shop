@@ -22,9 +22,8 @@ class BoughtProduct {
 }
 
 class ProductBoughtPage extends StatelessWidget {
-  final bool isLoggedIn;
 
-  ProductBoughtPage({super.key, required this.isLoggedIn});
+  ProductBoughtPage({super.key});
 
   final List<BoughtProduct> boughtProducts = [
     BoughtProduct(
@@ -107,7 +106,7 @@ class ProductBoughtPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                LayoutPage(isLoggedIn: isLoggedIn),
+                                LayoutPage(),
                           ),
                         ); // Replace with your actual navigation
                       },
