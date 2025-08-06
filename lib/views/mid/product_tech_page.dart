@@ -5,11 +5,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:tech_fun/components/productcard_hovereffect.dart';
+import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/utils/database_service.dart';
+import 'package:tech_fun/utils/sort_methods.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class ProductTechPage extends StatefulWidget {
-
-  const ProductTechPage({super.key});
+  final List<ProductDetail> productList;
+  const ProductTechPage({super.key, required this.productList});
 
   @override
   State<ProductTechPage> createState() => _ProductTechPageState();
@@ -17,24 +20,6 @@ class ProductTechPage extends StatefulWidget {
 
 class _ProductTechPageState extends State<ProductTechPage>
     with TickerProviderStateMixin {
-  final List<Map<String, dynamic>> products = List.generate(
-    10,
-    (index) => {
-      'name': 'Product $index',
-      'price': (index + 1) * 10.0,
-      'image': [
-        'assets/product/product${(index % 3) + 1}.jpg',
-        'assets/product/product${(index % 3) + 1}.jpg',
-        'assets/product/product${(index % 3) + 1}.jpg',
-      ],
-      'discount': 30,
-      'rating': 4.5,
-      'sold': 45,
-      'delivery': 2,
-      'location': 'TP.HCM',
-    },
-  );
-
   Map<String, dynamic> selectedFilter = {
     'selectedPrice': '',
     'selectedProductListType': '',
@@ -307,6 +292,8 @@ class _ProductTechPageState extends State<ProductTechPage>
   late Animation<Color?> _color2;
   late Animation<Color?> _color3;
 
+  List<ProductDetail> productList = [];
+  List<ProductDetail> productList_Origin = [];
   @override
   void initState() {
     super.initState();
@@ -329,6 +316,16 @@ class _ProductTechPageState extends State<ProductTechPage>
       begin: const Color(0xFFFFFFFF), // White
       end: const Color(0xFF37474F), // Blue Grey 800 (deep tech grey)
     ).animate(_bgController);
+    _loadDataFuture = loadData();
+  }
+
+  late Future<void> _loadDataFuture;
+
+  Future<void> loadData() async {
+    productList = widget.productList.isEmpty
+        ? await FirebaseCloundService.getAllProducts()
+        : widget.productList;
+    productList_Origin = await FirebaseCloundService.getAllProducts();
   }
 
   @override
@@ -340,91 +337,106 @@ class _ProductTechPageState extends State<ProductTechPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedBuilder(
-        animation: _bgController,
-        builder: (context, child) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment.center,
-                radius: 1.2,
-                colors: [
-                  _color1.value ?? Colors.black,
-                  _color2.value ?? Colors.blue,
-                  _color3.value ?? Colors.white,
-                ],
-                stops: const [0.0, 0.5, 1.0],
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // AppBar-style header
-                  // 🔵 HEADER: Back, Search, Filter
-                  TechHeader(
-                    onFilterTap: _openFilterDialog,
-                  ),
-                  // 🔽 SORT OPTIONS (Horizontal Row)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    color: Colors.transparent,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          _buildSortChip("Delivery Today"),
-                          _buildSortChip("Most Sold"),
-                          _buildSortChip("Newest"),
-                          _buildPriceToggleChip(),
-                        ],
+      body: FutureBuilder(
+        future: _loadDataFuture,
+        builder: (context, asyncSnapshot) {
+          switch (asyncSnapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Text('Loading....');
+            default:
+              if (asyncSnapshot.hasError)
+                return Text('Error: ${asyncSnapshot.error}');
+              else {
+                return AnimatedBuilder(
+                  animation: _bgController,
+                  builder: (context, child) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          center: Alignment.center,
+                          radius: 1.2,
+                          colors: [
+                            _color1.value ?? Colors.black,
+                            _color2.value ?? Colors.blue,
+                            _color3.value ?? Colors.white,
+                          ],
+                          stops: const [0.0, 0.5, 1.0],
+                        ),
                       ),
-                    ),
-                  ),
-
-                  // Product List
-                  Expanded(
-                    child: ScrollConfiguration(
-                      behavior: const MaterialScrollBehavior().copyWith(
-                        dragDevices: {
-                          PointerDeviceKind.touch,
-                          PointerDeviceKind.mouse,
-                        },
-                      ),
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 0.75,
-                            ),
-                        itemCount: products.length,
-                        itemBuilder: (context, index) {
-                          final product = products[index];
-                          return AnimationConfiguration.staggeredGrid(
-                            position: index,
-                            duration: const Duration(milliseconds: 375),
-                            columnCount: 2,
-                            child: ScaleAnimation(
-                              child: FadeInAnimation(
-                                child: ProductCardHoverEffect(
-                                  product: product,
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            // AppBar-style header
+                            // 🔵 HEADER: Back, Search, Filter
+                            TechHeader(onFilterTap: _openFilterDialog),
+                            // 🔽 SORT OPTIONS (Horizontal Row)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              color: Colors.transparent,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    _buildSortChip("Delivery Today"),
+                                    _buildSortChip("Most Sold"),
+                                    _buildSortChip("Most Rate"),
+                                    _buildPriceToggleChip(),
+                                  ],
                                 ),
                               ),
                             ),
-                          );
-                        },
+
+                            // Product List
+                            Expanded(
+                              child: ScrollConfiguration(
+                                behavior: const MaterialScrollBehavior()
+                                    .copyWith(
+                                      dragDevices: {
+                                        PointerDeviceKind.touch,
+                                        PointerDeviceKind.mouse,
+                                      },
+                                    ),
+                                child: GridView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 10,
+                                        mainAxisSpacing: 10,
+                                        childAspectRatio: 0.75,
+                                      ),
+                                  itemCount: productList.length,
+                                  itemBuilder: (context, index) {
+                                    final product = productList[index];
+                                    return AnimationConfiguration.staggeredGrid(
+                                      position: index,
+                                      duration: const Duration(
+                                        milliseconds: 375,
+                                      ),
+                                      columnCount: 2,
+                                      child: ScaleAnimation(
+                                        child: FadeInAnimation(
+                                          child: ProductCardHoverEffect(
+                                            product: product,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+                    );
+                  },
+                );
+              }
+          }
         },
       ),
     );
@@ -440,6 +452,30 @@ class _ProductTechPageState extends State<ProductTechPage>
         onSelected: (_) {
           setState(() {
             selectedSort = label;
+            productList = productList_Origin;
+            switch (label) {
+              case "Delivery Today":
+                productList = productList
+                    .where((element) => element.deliveryDays == 1)
+                    .toList();
+                break;
+              case "Most Sold":
+                quickSortDescending_sold(
+                  productList,
+                  0,
+                  productList.length - 1,
+                );
+
+                break;
+              case "Most Rate":
+                quickSortDescending_rate(
+                  productList,
+                  0,
+                  productList.length - 1,
+                );
+
+                break;
+            }
           });
         },
         backgroundColor: Colors.blueGrey,
@@ -471,28 +507,143 @@ class _ProductTechPageState extends State<ProductTechPage>
         backgroundColor: Colors.blueGrey,
         onSelected: (_) {
           setState(() {
+            productList = productList_Origin;
             if (!isIncrease && !isDecrease) {
               selectedSort = 'Prices gradually increase';
+              quickSort(productList, 0, productList.length - 1);
             } else if (isIncrease) {
               selectedSort = 'Prices gradually decrease';
+              quickSortDescending(productList, 0, productList.length - 1);
             } else {
               selectedSort = 'None';
+              productList = productList_Origin;
             }
           });
         },
       ),
     );
   }
+
+  void quickSort(List<ProductDetail> list, int low, int high) {
+    if (low < high) {
+      int pivotIndex = _partition(list, low, high);
+      quickSort(list, low, pivotIndex - 1);
+      quickSort(list, pivotIndex + 1, high);
+    }
+  }
+
+  int _partition(List<ProductDetail> list, int low, int high) {
+    double pivot = list[high].price;
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+      if (list[j].price < pivot) {
+        i++;
+        double temp = list[i].price;
+        list[i].price = list[j].price;
+        list[j].price = temp;
+      }
+    }
+
+    double temp = list[i + 1].price;
+    list[i + 1].price = list[high].price;
+    list[high].price = temp;
+
+    return i + 1;
+  }
+
+  void quickSortDescending(List<ProductDetail> list, int low, int high) {
+    if (low < high) {
+      int pivotIndex = _partitionDescending(list, low, high);
+      quickSortDescending(list, low, pivotIndex - 1);
+      quickSortDescending(list, pivotIndex + 1, high);
+    }
+  }
+
+  int _partitionDescending(List<ProductDetail> list, int low, int high) {
+    double pivot = list[high].price;
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+      if (list[j].price > pivot) {
+        // Change '<' to '>'
+        i++;
+        double temp = list[i].price;
+        list[i].price = list[j].price;
+        list[j].price = temp;
+      }
+    }
+
+    double temp = list[i + 1].price;
+    list[i + 1].price = list[high].price;
+    list[high].price = temp;
+
+    return i + 1;
+  }
+
+  void quickSortDescending_rate(List<ProductDetail> list, int low, int high) {
+    if (low < high) {
+      int pivotIndex = _partitionDescending_rate(list, low, high);
+      quickSortDescending_rate(list, low, pivotIndex - 1);
+      quickSortDescending_rate(list, pivotIndex + 1, high);
+    }
+  }
+
+  int _partitionDescending_rate(List<ProductDetail> list, int low, int high) {
+    double pivot = list[high].rate;
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+      if (list[j].rate > pivot) {
+        // Change '<' to '>'
+        i++;
+        double temp = list[i].rate;
+        list[i].rate = list[j].rate;
+        list[j].rate = temp;
+      }
+    }
+
+    double temp = list[i + 1].rate;
+    list[i + 1].rate = list[high].rate;
+    list[high].rate = temp;
+
+    return i + 1;
+  }
+
+  void quickSortDescending_sold(List<ProductDetail> list, int low, int high) {
+    if (low < high) {
+      int pivotIndex = _partitionDescending_sold(list, low, high);
+      quickSortDescending_sold(list, low, pivotIndex - 1);
+      quickSortDescending_sold(list, pivotIndex + 1, high);
+    }
+  }
+
+  int _partitionDescending_sold(List<ProductDetail> list, int low, int high) {
+    int pivot = list[high].solds;
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+      if (list[j].solds > pivot) {
+        // Change '<' to '>'
+        i++;
+        int temp = list[i].solds;
+        list[i].solds = list[j].solds;
+        list[j].solds = temp;
+      }
+    }
+
+    int temp = list[i + 1].solds;
+    list[i + 1].solds = list[high].solds;
+    list[high].solds = temp;
+
+    return i + 1;
+  }
 }
 
 class TechHeader extends StatelessWidget {
-
   final VoidCallback onFilterTap;
 
-  const TechHeader({
-    super.key,
-    required this.onFilterTap,
-  });
+  const TechHeader({super.key, required this.onFilterTap});
 
   @override
   Widget build(BuildContext context) {
@@ -520,9 +671,7 @@ class TechHeader extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => LayoutPage(),
-                ),
+                MaterialPageRoute(builder: (_) => LayoutPage()),
               );
             },
           ),
@@ -535,10 +684,28 @@ class TechHeader extends StatelessWidget {
                 color: Colors.white.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const TextField(
-                cursorColor: Color.fromARGB(255, 14, 167, 134),
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+              child: TextField(
+                onSubmitted: (value) async {
+                  List<ProductDetail> list =
+                      await FirebaseCloundService.getAllProducts();
+
+                  list = list
+                      .where(
+                        (element) => element.name.toLowerCase().contains(
+                          value.toLowerCase().trim(),
+                        ),
+                      )
+                      .toList();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductTechPage(productList: list),
+                    ),
+                  );
+                },
+                cursorColor: const Color.fromARGB(255, 14, 167, 134),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
                   icon: Icon(Icons.search, color: Colors.white70),
                   hintText: 'Search tech products...',
                   hintStyle: TextStyle(color: Colors.white54),

@@ -5,17 +5,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tech_fun/components/productcard_hovereffect.dart';
+import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetailPage extends StatefulWidget {
+  final ProductDetail productDetail;
 
-  final List<String> imageGallery;
-
-  const ProductDetailPage({
-    super.key,
-    required this.imageGallery,
-  });
+  const ProductDetailPage({super.key, required this.productDetail});
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -30,6 +28,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   late PageController _pageController;
   int _currentPage = 0;
   late Map<String, dynamic> productInfo;
+  List<ProductDetail> productList = [];
 
   @override
   void initState() {
@@ -49,6 +48,13 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       begin: const Color.fromARGB(255, 11, 1, 146),
       end: const Color.fromARGB(255, 82, 156, 148),
     ).animate(_animationController);
+    _loadDataFuture = loadData();
+  }
+
+  late Future<void> _loadDataFuture;
+
+  Future<void> loadData() async {
+    productList = await FirebaseCloundService.getAllProducts();
   }
 
   @override
@@ -61,39 +67,44 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedBuilder(
-        animation: _animationController,
-        builder: (context, child) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [_bgColor1.value!, _bgColor2.value!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: SafeArea(
-              child: ScrollConfiguration(
-                behavior: const MaterialScrollBehavior().copyWith(
-                  dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
-                  },
+      body: FutureBuilder(
+        future: _loadDataFuture,
+        builder: (context, asyncSnapshot) {
+          return AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [_bgColor1.value!, _bgColor2.value!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    _buildHeader(),
-                    _buildImageGallery(),
-                    _buildImageThumbnails(),
-                    Expanded(
-                      child:
-                          _buildMainContent(), // Modular content below image section
+                child: SafeArea(
+                  child: ScrollConfiguration(
+                    behavior: const MaterialScrollBehavior().copyWith(
+                      dragDevices: {
+                        PointerDeviceKind.touch,
+                        PointerDeviceKind.mouse,
+                      },
                     ),
-                    _buildFooterActions(),
-                  ],
+                    child: Column(
+                      children: [
+                        _buildHeader(),
+                        _buildImageGallery(),
+                        _buildImageThumbnails(),
+                        Expanded(
+                          child:
+                              _buildMainContent(), // Modular content below image section
+                        ),
+                        _buildFooterActions(),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),
@@ -110,10 +121,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      LayoutPage(),
-                ),
+                MaterialPageRoute(builder: (context) => LayoutPage()),
               );
             },
           ),
@@ -150,7 +158,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
           IconButton(
             icon: Icon(Icons.share, color: Colors.white),
-            onPressed: () => _showShareOptions(productInfo),
+            onPressed: () => _showShareOptions(widget.productDetail),
           ),
           IconButton(
             icon: Icon(Icons.shopping_cart, color: Colors.white),
@@ -172,7 +180,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         children: [
           PageView.builder(
             controller: _pageController,
-            itemCount: widget.imageGallery.length,
+            itemCount: widget.productDetail.images.length,
             onPageChanged: (index) => setState(() => _currentPage = index),
             itemBuilder: (context, index) {
               return Padding(
@@ -180,7 +188,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
-                    widget.imageGallery[index],
+                    widget.productDetail.images[index],
                     fit: BoxFit.cover,
                     width: double.infinity,
                   ),
@@ -198,7 +206,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '${_currentPage + 1} / ${widget.imageGallery.length}',
+                '${_currentPage + 1} / ${widget.productDetail.images.length}',
                 style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
             ),
@@ -209,7 +217,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   Widget _buildImageThumbnails() {
-    final totalImages = widget.imageGallery.length;
+    final totalImages = widget.productDetail.images.length;
     final hasOverflow = totalImages > 5;
     final thumbnailsToShow = hasOverflow ? 5 : totalImages;
     final remainingCount = totalImages - 4;
@@ -259,7 +267,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.asset(
-                      widget.imageGallery[imageIndex],
+                      widget.productDetail.images[imageIndex],
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
@@ -275,7 +283,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        '+$remainingCount',
+                        '+${remainingCount.toString()}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -304,8 +312,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '₫199,000',
+              Text(
+                '\$${widget.productDetail.price.toString()}',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -314,7 +322,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               ),
               Row(
                 children: [
-                  const Text('1.2k sold', style: TextStyle(color: Colors.grey)),
+                  Text(
+                    '${widget.productDetail.solds.toString()} sold',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
@@ -335,8 +346,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           const SizedBox(height: 8),
 
           // Row 2: Product Name
-          const Text(
-            'Awesome Bluetooth Speaker 2024',
+          Text(
+            widget.productDetail.name,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -347,8 +358,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           const SizedBox(height: 12),
 
           // Row 3: Ship From → To
-          const Text(
-            'Ships from: Hanoi → Ho Chi Minh City',
+          Text(
+            'Ships from: ${widget.productDetail.location} → Ho Chi Minh City',
             style: TextStyle(color: Colors.grey),
           ),
 
@@ -385,15 +396,15 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
-                    backgroundImage: AssetImage('assets/shop_avatar.png'),
+                  CircleAvatar(
+                    backgroundImage: AssetImage(widget.productDetail.images[0]),
                   ),
                   const SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        'ShopName Official',
+                        widget.productDetail.shop,
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
@@ -525,7 +536,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 10),
-          _buildSuggestedProducts(),
+          _buildSuggestedProducts(productList),
         ],
       ),
     );
@@ -538,19 +549,13 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     return Table(
       columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
       children: [
-        _buildDetailRow('Waterproof', '100%'),
-        _buildSpacerRow(),
-        _buildDetailRow('Battery life', '12 hours'),
-        _buildSpacerRow(),
-        _buildDetailRow('Bluetooth', '5.0, 30m range'),
-        _buildSpacerRow(),
-        _buildDetailRow('Inputs', 'SD card, USB'),
-        _buildSpacerRow(),
-        _buildDetailRow('Compatible', 'iOS & Android'),
-        _buildSpacerRow(),
-        _buildDetailRow('Weight', '450g'),
-        _buildSpacerRow(),
-        _buildDetailRow('Dimensions', '18 × 7 × 6 cm'),
+        // Dynamically create rows from detail map
+        ...widget.productDetail.detail.entries.expand(
+          (entry) => [
+            _buildDetailRow(entry.key, entry.value.toString()),
+            _buildSpacerRow(),
+          ],
+        ),
       ],
     );
   }
@@ -659,14 +664,12 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   bool _isExpanded = false;
   Widget _buildProductDescription() {
-    const fullDescription =
-        '''It's summertime -- or as I like to call it, portable Bluetooth speaker season. I test everything from tiny speakers that strap onto the handle bars of your bike to big Bluetooth boom boxes that pump out surprisingly powerful sound that can fuel your outdoor pool and beach parties. With each passing year Bluetooth speakers continue to improve, featuring better sound quality, longer battery life and more durable designs that makes them suitable for indoor and outdoor use. Many are fully waterproof and some even float. I've included options in every size category and price range, with several budget-friendly choices for those who don't want to spend a lot.''';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          fullDescription,
+          widget.productDetail.description,
           maxLines: _isExpanded ? null : 10,
           overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
           style: const TextStyle(color: Colors.white),
@@ -690,25 +693,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  final List<Map<String, dynamic>> products = List.generate(
-    10,
-    (index) => {
-      'name': 'Product $index',
-      'price': (index + 1) * 10.0,
-      'image': [
-        'assets/product/product${(index % 3) + 1}.jpg',
-        'assets/product/product${(index % 3) + 1}.jpg',
-        'assets/product/product${(index % 3) + 1}.jpg',
-      ],
-      'discount': 30,
-      'rating': 4.5,
-      'sold': 45,
-      'delivery': 2,
-      'location': 'TP.HCM',
-    },
-  );
-
-  Widget _buildSuggestedProducts() {
+  Widget _buildSuggestedProducts(dynamic products) {
     return SizedBox(
       height: 270, // Increase height to fit card content
       child: ListView.builder(
@@ -718,9 +703,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         itemBuilder: (context, index) {
           return SizedBox(
             width: 160, // Width of each product card
-            child: ProductCardHoverEffect(
-              product: products[index],
-            ),
+            child: ProductCardHoverEffect(product: products[index]),
           );
         },
       ),
@@ -781,7 +764,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  void _showShareOptions(Map<String, dynamic> product) {
+  void _showShareOptions(ProductDetail product) {
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1F1F2E), // Dark techy background
@@ -858,11 +841,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  void _shareToGmail(Map<String, dynamic> product) async {
-    final subject = '${product['name']} - \$${product['price']}';
-    final images = product['image'].join('\n');
-    final body =
-        '${product['name']} - \$${product['price']} - ${product['location']}';
+  void _shareToGmail(ProductDetail product) async {
+    final subject = '${product.name} - \$${product.price}';
+    final images = product.images.join('\n');
+    final body = '${product.name} - \$${product.price} - ${product.location}';
 
     final uri = Uri(
       scheme: 'mailto',
@@ -874,28 +856,28 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     if (await canLaunchUrl(uri)) launchUrl(uri);
   }
 
-  void _shareToOutlook(Map<String, dynamic> product) =>
+  void _shareToOutlook(ProductDetail product) =>
       _shareToGmail(product); // dùng mailto giống Gmail
-  String _composeShareText(Map<String, dynamic> product) {
-    final images = product['image'].join('\n');
-    return '${product['name']}\n${product['price']}\n\n$images';
+  String _composeShareText(ProductDetail product) {
+    final images = product.images.join('\n');
+    return '${product.name}\n${product.price}\n\n$images';
   }
 
-  void _shareToFacebook(Map<String, dynamic> product) async {
+  void _shareToFacebook(ProductDetail product) async {
     final content = _composeShareText(product);
     final fbUrl =
         'https://www.facebook.com/sharer/sharer.php?u=https://example.com&quote=${Uri.encodeComponent(content)}';
     if (await canLaunchUrl(Uri.parse(fbUrl))) launchUrl(Uri.parse(fbUrl));
   }
 
-  void _shareToTeams(Map<String, dynamic> product) async {
+  void _shareToTeams(ProductDetail product) async {
     final content = _composeShareText(product);
     final teamsUrl =
         'https://teams.microsoft.com/share?msg=${Uri.encodeComponent(content)}';
     if (await canLaunchUrl(Uri.parse(teamsUrl))) launchUrl(Uri.parse(teamsUrl));
   }
 
-  void _shareToZalo(Map<String, dynamic> product) async {
+  void _shareToZalo(ProductDetail product) async {
     final content = _composeShareText(product);
     final zaloUrl =
         'https://zalo.me/share?url=https://example.com&text=${Uri.encodeComponent(content)}';

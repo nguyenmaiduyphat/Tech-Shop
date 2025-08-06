@@ -3,6 +3,8 @@
 import 'dart:ui';
 import 'package:animation_list/animation_list.dart';
 import 'package:flutter/material.dart';
+import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/views/mid/edit_product_page.dart';
 import 'package:tech_fun/views/mid/post_detail_page.dart';
 import 'package:tech_fun/views/mid/post_store_page.dart';
@@ -11,7 +13,6 @@ import 'package:tech_fun/views/mid/product_detail_page.dart';
 import 'package:tech_fun/views/mid/product_store_page.dart';
 
 class MyStorePage extends StatefulWidget {
-
   const MyStorePage({super.key});
 
   @override
@@ -45,109 +46,132 @@ class _MyStorePageState extends State<MyStorePage> {
       'title': 'Post Title $index',
     },
   );
-
+  List<ProductDetail> productList = [];
   final List<Map<String, dynamic>> boughtProducts = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadDataFuture = loadData();
+  }
+
+  late Future<void> _loadDataFuture;
+
+  Future<void> loadData() async {
+    productList = await FirebaseCloundService.getAllProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ScrollConfiguration(
-        behavior: const MaterialScrollBehavior().copyWith(
-          dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return FutureBuilder(
+      future: _loadDataFuture,
+      builder: (context, asyncSnapshot) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ScrollConfiguration(
+            behavior: const MaterialScrollBehavior().copyWith(
+              dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-            children: [
-              // Store Info
-              Row(
                 children: [
-                  const CircleAvatar(
-                    radius: 32,
-                    backgroundImage: AssetImage('assets/user/user1.jpg'),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Your Store Name',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ),
+                  // Store Info
+                  Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 32,
+                        backgroundImage: AssetImage('assets/user/user1.jpg'),
                       ),
-                      Text(
-                        'Owner: John Doe',
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            'Your Store Name',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          Text(
+                            'Owner: John Doe',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+                  const SizedBox(height: 24),
+
+                  // Stats
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatBox(
+                        'Orders Bought',
+                        '${boughtProducts.length}',
+                      ),
+                      _buildStatBox('Products', '${products.length}'),
+                      _buildStatBox('Posts', '${posts.length}'),
+                      _buildStatBox('Revenue', '\$5.2K'),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Your Products
+                  _buildSectionTitle('Your Products', () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductStorePage(),
+                      ),
+                    );
+                  }),
+                  _buildProductList(
+                    productList,
+                    emptyMessage: 'Upload your product',
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Your Posts
+                  _buildSectionTitle('Your Posts', () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => PostStorePage()),
+                    );
+                  }),
+                  _buildPostList(posts, emptyMessage: 'No posts yet'),
+
+                  const SizedBox(height: 16),
+
+                  // Bought Products
+                  _buildSectionTitle('Products Bought', () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductBoughtPage(),
+                      ),
+                    );
+                  }),
+                  _buildProductList(
+                    productList,
+                    editable: false,
+                    emptyMessage: 'You haven’t bought anything yet',
+                  ),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              // Stats
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatBox('Orders Bought', '${boughtProducts.length}'),
-                  _buildStatBox('Products', '${products.length}'),
-                  _buildStatBox('Posts', '${posts.length}'),
-                  _buildStatBox('Revenue', '\$5.2K'),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Your Products
-              _buildSectionTitle('Your Products', () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ProductStorePage(),
-                  ),
-                );
-              }),
-              _buildProductList(products, emptyMessage: 'Upload your product'),
-
-              const SizedBox(height: 16),
-
-              // Your Posts
-              _buildSectionTitle('Your Posts', () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PostStorePage(),
-                  ),
-                );
-              }),
-              _buildPostList(posts, emptyMessage: 'No posts yet'),
-
-              const SizedBox(height: 16),
-
-              // Bought Products
-              _buildSectionTitle('Products Bought', () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ProductBoughtPage(),
-                  ),
-                );
-              }),
-              _buildProductList(
-                boughtProducts,
-                editable: false,
-                emptyMessage: 'You haven’t bought anything yet',
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -192,7 +216,7 @@ class _MyStorePageState extends State<MyStorePage> {
   }
 
   Widget _buildProductList(
-    List<Map<String, dynamic>> list, {
+    List<ProductDetail> list, {
     bool editable = true,
     required String emptyMessage,
   }) {
@@ -226,36 +250,31 @@ class _MyStorePageState extends State<MyStorePage> {
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
-                      item['image'][0],
+                      item.images[0],
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
                     ),
                   ),
                   title: Text(
-                    item['name'] ?? item['title'],
+                    item.name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
                   ),
-                  subtitle: item['price'] != null
-                      ? Text(
-                          '\$${item['price']}',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                          ),
-                        )
-                      : null,
+                  subtitle: Text(
+                    '\$${item.price.toString()}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                   trailing: GestureDetector(
                     onTapDown: (TapDownDetails details) {
                       _showItemOptions(
                         context: context,
                         offset: details.globalPosition,
                         index: index,
-                        list: list,
+                        list: productList,
                         isPost: false,
                         item: item,
                       );
@@ -319,14 +338,14 @@ class _MyStorePageState extends State<MyStorePage> {
                       ),
                       GestureDetector(
                         onTapDown: (TapDownDetails details) {
-                          _showItemOptions(
-                            context: context,
-                            offset: details.globalPosition,
-                            index: index,
-                            list: list,
-                            isPost: true,
-                            item: item,
-                          );
+                          // _showItemOptions(
+                          //   context: context,
+                          //   offset: details.globalPosition,
+                          //   index: index,
+                          //   list: list,
+                          //   isPost: true,
+                          //   item: item,
+                          // );
                         },
                         child: const Icon(
                           Icons.more_vert,
@@ -345,8 +364,8 @@ class _MyStorePageState extends State<MyStorePage> {
     required BuildContext context,
     required Offset offset,
     required int index,
-    required List<Map<String, dynamic>> list,
-    required Map<String, dynamic> item,
+    required List<ProductDetail> list,
+    required ProductDetail item,
     required bool isPost,
   }) async {
     final Size screenSize = MediaQuery.of(context).size;
@@ -402,9 +421,8 @@ class _MyStorePageState extends State<MyStorePage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProductDetailPage(
-                        imageGallery: item['image'],
-                      ),
+                      builder: (context) =>
+                          ProductDetailPage(productDetail: item),
                     ),
                   );
                 },
@@ -422,9 +440,7 @@ class _MyStorePageState extends State<MyStorePage> {
       ).showSnackBar(const SnackBar(content: Text('Edit clicked')));
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => EditProductPage(),
-        ),
+        MaterialPageRoute(builder: (context) => EditProductPage()),
       );
     } else if (result == 'view') {
       ScaffoldMessenger.of(

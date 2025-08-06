@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class AnimatedSearchBar extends StatelessWidget {
   final Function(String) onSubmitted;
+  final TextEditingController searchBar;
 
-  const AnimatedSearchBar({super.key, required this.onSubmitted});
+  const AnimatedSearchBar({
+    super.key,
+    required this.onSubmitted,
+    required this.searchBar,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +25,7 @@ class AnimatedSearchBar extends StatelessWidget {
           children: [
             Expanded(
               child: TextField(
+                controller: searchBar,
                 cursorColor: const Color.fromARGB(255, 14, 167, 134),
                 autofocus: true,
                 onSubmitted: onSubmitted,

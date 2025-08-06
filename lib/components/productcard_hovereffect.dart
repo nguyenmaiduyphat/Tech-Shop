@@ -1,14 +1,14 @@
+// ignore_for_file: unnecessary_string_interpolations
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/views/mid/product_detail_page.dart';
 
 class ProductCardHoverEffect extends StatefulWidget {
-  final Map<String, dynamic> product;
+  final ProductDetail product;
 
-  const ProductCardHoverEffect({
-    super.key,
-    required this.product,
-  });
+  const ProductCardHoverEffect({super.key, required this.product});
 
   @override
   State<ProductCardHoverEffect> createState() => _ProductCardHoverEffectState();
@@ -57,9 +57,8 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ProductDetailPage(
-                  imageGallery: widget.product['image'],
-                ),
+                builder: (context) =>
+                    ProductDetailPage(productDetail: widget.product),
               ),
             );
           },
@@ -96,7 +95,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Image.asset(
-                              widget.product['image'][0],
+                              widget.product.images[0],
                               width: double.infinity,
                               fit: BoxFit.cover,
                             ),
@@ -108,7 +107,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
 
                       /// 🏷️ Product Name
                       Text(
-                        widget.product['name'],
+                        widget.product.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -125,7 +124,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                         children: [
                           Expanded(
                             child: Text(
-                              '\$${widget.product['price'].toStringAsFixed(2)}',
+                              '\$${widget.product.price.toString()}',
                               style: TextStyle(
                                 color: isHovered
                                     ? Colors.deepOrange
@@ -135,7 +134,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                               ),
                             ),
                           ),
-                          if (widget.product.containsKey('discount'))
+                          if (widget.product.discount != 0)
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6,
@@ -146,7 +145,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                '-${widget.product['discount']}%',
+                                '-${widget.product.discount.toString()}%',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -165,7 +164,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                           const Icon(Icons.star, color: Colors.amber, size: 16),
                           const SizedBox(width: 4),
                           Text(
-                            '${widget.product['rating']}',
+                            '${widget.product.rate.toString()}',
                             style: TextStyle(
                               color: isHovered
                                   ? Colors.deepOrange
@@ -176,7 +175,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
-                              '${widget.product['sold']} sold',
+                              '${widget.product.solds.toString()} sold',
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: isHovered
@@ -201,7 +200,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${widget.product['delivery']} ${widget.product['delivery'] > 1 ? 'days' : 'day'}',
+                            '${widget.product.deliveryDays.toString()} ${widget.product.deliveryDays > 1 ? 'days' : 'day'}',
                             style: TextStyle(
                               color: isHovered
                                   ? Colors.deepOrange
@@ -223,7 +222,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                           const SizedBox(width: 2),
                           Flexible(
                             child: Text(
-                              widget.product['location'],
+                              widget.product.location,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: isHovered

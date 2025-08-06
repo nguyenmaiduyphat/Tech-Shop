@@ -8,6 +8,11 @@ class SecureStorageService {
   static final String offlineStatus = 'Guest';
   static String currentUser = 'Guest';
 
+  /// ✅ Initialize currentUser asynchronously
+  static Future<void> init() async {
+    currentUser = await read(keyName) ?? offlineStatus;
+  }
+
   /// ✅ Save a value with a key
   static Future<void> save(String key, String value) async {
     await _storage.write(key: key, value: value);
@@ -15,7 +20,7 @@ class SecureStorageService {
 
   /// ✅ Read a value by key
   static Future<String?> read(String key) async {
-    bool isExist = await contains(SecureStorageService.keyName);
+    bool isExist = await contains(key);
     return isExist ? await _storage.read(key: key) : offlineStatus;
   }
 

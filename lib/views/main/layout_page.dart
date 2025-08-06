@@ -7,6 +7,8 @@ import 'package:lottie/lottie.dart';
 import 'package:tech_fun/components/DrawerMenuItem.dart';
 import 'package:tech_fun/components/animatedsearchnar.dart';
 import 'package:tech_fun/components/user_avatar.dart';
+import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
 import 'package:tech_fun/views/bottom_view/my_store_page.dart';
@@ -28,6 +30,9 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
   late Color currentColor;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _pageController = PageController(initialPage: 0);
+  final TextEditingController _searchBarController = TextEditingController(
+    text: '',
+  );
 
   /// Controller to handle bottom nav bar and also handles initial page
   final NotchBottomBarController _controller = NotchBottomBarController(
@@ -66,11 +71,6 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
     ).animate(_bgController);
 
     currentColor = Colors.white;
-
-    
-    SecureStorageService.currentUser = SecureStorageService.read(
-      SecureStorageService.keyName,
-    ).toString();
   }
 
   @override
@@ -253,7 +253,9 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => ProductTechPage()),
+                  MaterialPageRoute(
+                    builder: (context) => ProductTechPage(productList: []),
+                  ),
                 );
               }),
               DrawerMenuItem("News", () {
@@ -284,9 +286,28 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: AnimatedSearchBar(
                   // ignore: avoid_types_as_parameter_names, non_constant_identifier_names
-                  onSubmitted: (String) {
+                  onSubmitted: (String) async {
+                    List<ProductDetail> list =
+                        await FirebaseCloundService.getAllProducts();
+
+                    list = list
+                        .where(
+                          (element) => element.name.toLowerCase().contains(
+                            _searchBarController.text.toLowerCase().trim(),
+                          ),
+                        )
+                        .toList();
+
                     Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ProductTechPage(productList: list),
+                      ),
+                    );
                   },
+                  searchBar: _searchBarController,
                 ),
               ),
 
