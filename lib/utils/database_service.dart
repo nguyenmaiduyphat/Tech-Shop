@@ -2,7 +2,14 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:tech_fun/models/comment_detail.dart';
+import 'package:tech_fun/models/event_detail.dart';
+import 'package:tech_fun/models/news_detail.dart';
+import 'package:tech_fun/models/order_detail.dart';
+import 'package:tech_fun/models/post_info.dart';
 import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/models/review_detail.dart';
+import 'package:tech_fun/models/shop_detail.dart';
 import 'package:tech_fun/models/user_detail.dart';
 
 enum NameTable {
@@ -11,13 +18,11 @@ enum NameTable {
   PRODUCTS,
   ORDERS,
   STORE,
-  FINANCE,
   EVENTS,
   NEWS,
+  COMMENTS,
   REVIEWS,
 }
-
-
 
 class FirebaseCloundService {
   /// USERS
@@ -128,10 +133,56 @@ class FirebaseCloundService {
   static Future<void> deleteProduct(String id) async {
     await _firestore.collection(NameTable.PRODUCTS.name).doc(id).delete();
   }
+
+  /// COMMENTS
+  static Future<void> addComment(CommentDetail comment) async {
+    await _firestore.collection(NameTable.COMMENTS.name).add(comment.toMap());
+  }
+
+  /// EVENTS
+  static Future<void> addEvent(EventDetail event) async {
+    await _firestore.collection(NameTable.EVENTS.name).add(event.toMap());
+  }
+
+  /// NEWS
+  static Future<void> addNews(NewsDetail news) async {
+    await _firestore.collection(NameTable.NEWS.name).add(news.toMap());
+  }
+
+  /// ORDERS
+  static Future<void> addOrder(OrderDetail order) async {
+    await _firestore.collection(NameTable.ORDERS.name).add(order.toMap());
+  }
+
+  /// POSTS
+  static Future<void> addPost(PostInfo post) async {
+    await _firestore.collection(NameTable.POSTS.name).add(post.toMap());
+  }
+
+  static Future<List<PostInfo>> getAllPosts() async {
+    final snapshot = await _firestore.collection(NameTable.POSTS.name).get();
+    return snapshot.docs.map((doc) => PostInfo.fromMap(doc.data())).toList();
+  }
+
+  /// REVIEWS
+  static Future<void> addReview(ReviewDetail review) async {
+    await _firestore.collection(NameTable.REVIEWS.name).add(review.toMap());
+  }
+
+  /// SHOPS
+  static Future<void> addShop(ShopDetail shop) async {
+    await _firestore.collection(NameTable.STORE.name).add(shop.toMap());
+  }
 }
 
 class FirebaseRealtimeService {
-  final dbRef = FirebaseDatabase.instance.ref();
+  static final dbRef = FirebaseDatabase.instance.ref();
+
+  static Future<void> addComment(CommentDetail comment) async {
+    await dbRef
+        .child("${NameTable.COMMENTS.name}/${comment.id}")
+        .set(comment.toMap());
+  }
 
   Future<void> addUser(UserDetail user) async {
     await dbRef

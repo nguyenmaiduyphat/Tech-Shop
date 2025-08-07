@@ -3,6 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/utils/formatcurrency.dart';
 import 'package:tech_fun/views/mid/product_detail_page.dart';
 
 class ProductCardHoverEffect extends StatefulWidget {
@@ -124,7 +125,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                         children: [
                           Expanded(
                             child: Text(
-                              '\$${widget.product.price.toString()}',
+                              formatCurrency(widget.product.price),
                               style: TextStyle(
                                 color: isHovered
                                     ? Colors.deepOrange

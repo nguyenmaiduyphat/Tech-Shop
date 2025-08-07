@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, non_constant_identifier_names
 
 import 'dart:ui';
 
@@ -23,12 +23,13 @@ class _ProductTechPageState extends State<ProductTechPage>
   Map<String, dynamic> selectedFilter = {
     'selectedPrice': '',
     'selectedProductListType': '',
-    'selectedUsage': '',
-    'selectedShipping': '',
+    'selectedShopName': '',
+    'selectedLocationShop': '',
+    'selectedStatusProduct': '',
     'selectedBrands': [],
     'selectedStar': 0,
   };
-  String selectedSort = 'None';
+  String selectedSort = 'none';
 
   void _openFilterDialog() {
     showModalBottomSheet(
@@ -79,12 +80,33 @@ class _ProductTechPageState extends State<ProductTechPage>
   Widget _buildFilterOptions() {
     String selectedPrice = selectedFilter['selectedPrice'];
     String selectedProductListType = selectedFilter['selectedProductListType'];
-    String selectedUsage = selectedFilter['selectedUsage'];
-    String selectedShipping = selectedFilter['selectedShipping'];
+    String selectedShopName = selectedFilter['selectedShopName'];
+    String selectedLocationShop = selectedFilter['selectedLocationShop'];
+    String selectedStatusProduct = selectedFilter['selectedStatusProduct'];
     List<String> selectedBrands = List<String>.from(
       selectedFilter['selectedBrands'],
     );
     int selectedStar = selectedFilter['selectedStar'];
+
+    final distinctShops = productList_Origin
+        .map((e) => e.shop)
+        .toSet()
+        .toList();
+
+    final distinctBrands = productList_Origin
+        .map((e) => e.brand)
+        .toSet()
+        .toList();
+
+    final distinctLocations = productList_Origin
+        .map((e) => e.location)
+        .toSet()
+        .toList();
+
+    final distinctDates = productList_Origin
+        .map((e) => e.date)
+        .toSet()
+        .toList();
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -127,7 +149,9 @@ class _ProductTechPageState extends State<ProductTechPage>
                       title: price,
                       value: price,
                       groupValue: selectedPrice,
-                      onChanged: (val) => setState(() => selectedPrice = val!),
+                      onChanged: (val) => setState(() {
+                        selectedPrice = val!;
+                      }),
                     ),
                   ),
                   const Divider(color: Colors.white54),
@@ -138,8 +162,9 @@ class _ProductTechPageState extends State<ProductTechPage>
                       title: sale,
                       value: sale,
                       groupValue: selectedProductListType,
-                      onChanged: (val) =>
-                          setState(() => selectedProductListType = val!),
+                      onChanged: (val) => setState(() {
+                        selectedProductListType = val!;
+                      }),
                     ),
                   ),
                   const Divider(color: Colors.white54),
@@ -195,88 +220,267 @@ class _ProductTechPageState extends State<ProductTechPage>
                   _sectionHeader("🏷️ Brand"),
                   Wrap(
                     spacing: 8,
-                    children: ['Apple', 'Samsung', 'Xiaomi', 'Sony', 'Asus']
-                        .map((brand) {
-                          final isSelected = selectedBrands.contains(brand);
-                          return FilterChip(
-                            label: Text(brand),
-                            selected: isSelected,
-                            backgroundColor: Colors.white10,
-                            selectedColor: const Color.fromARGB(
-                              255,
-                              180,
-                              5,
-                              87,
-                            ),
-                            checkmarkColor: Colors.white,
-                            labelStyle: TextStyle(
-                              color: isSelected
-                                  ? const Color.fromARGB(255, 43, 43, 43)
-                                  : const Color.fromARGB(179, 139, 131, 131),
-                            ),
-                            onSelected: (val) {
-                              setState(() {
-                                if (val) {
-                                  selectedBrands.add(brand);
-                                } else {
-                                  selectedBrands.remove(brand);
-                                }
-                              });
-                            },
-                          );
-                        })
-                        .toList(),
-                  ),
-                  const Divider(color: Colors.white54),
-                  _sectionHeader("📦 Usage Status"),
-                  ...['New', 'Old'].map(
-                    (status) => _customRadioTile(
-                      context: context,
-                      title: status,
-                      value: status,
-                      groupValue: selectedUsage,
-                      onChanged: (val) => setState(() => selectedUsage = val!),
-                    ),
-                  ),
-                  const Divider(color: Colors.white54),
-                  _sectionHeader("🚚 Shipping Unit"),
-                  ...['Express delivery', 'Economical delivery'].map(
-                    (type) => _customRadioTile(
-                      context: context,
-                      title: type,
-                      value: type,
-                      groupValue: selectedShipping,
-                      onChanged: (val) =>
-                          setState(() => selectedShipping = val!),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Center(
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.done),
-                      label: const Text("Apply"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.tealAccent[700],
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                    children: distinctBrands.map((brandName) {
+                      final isSelected = selectedBrands.contains(brandName);
+                      return FilterChip(
+                        label: Text(brandName),
+                        selected: isSelected,
+                        backgroundColor: Colors.white10,
+                        selectedColor: const Color.fromARGB(255, 180, 5, 87),
+                        checkmarkColor: Colors.white,
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? const Color.fromARGB(255, 43, 43, 43)
+                              : const Color.fromARGB(179, 139, 131, 131),
                         ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          selectedFilter = {
-                            'selectedPrice': selectedPrice,
-                            'selectedProductListType': selectedProductListType,
-                            'selectedUsage': selectedUsage,
-                            'selectedShipping': selectedShipping,
-                            'selectedBrands': selectedBrands,
-                            'selectedStar': selectedStar,
-                          };
-                        });
-                        Navigator.pop(context);
-                      },
+                        onSelected: (val) {
+                          setState(() {
+                            if (val) {
+                              selectedBrands.add(brandName);
+                            } else {
+                              selectedBrands.remove(brandName);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const Divider(color: Colors.white54),
+                  _sectionHeader("🏣 Shop"),
+                  ...distinctShops.map(
+                    (shopName) => _customRadioTile(
+                      context: context,
+                      title: shopName,
+                      value: shopName,
+                      groupValue: selectedShopName,
+                      onChanged: (val) => setState(() {
+                        selectedShopName = val!;
+                      }),
                     ),
+                  ),
+                  const Divider(color: Colors.white54),
+                  _sectionHeader("🚩 Location"),
+                  ...distinctLocations.map(
+                    (locationName) => _customRadioTile(
+                      context: context,
+                      title: locationName,
+                      value: locationName,
+                      groupValue: selectedLocationShop,
+                      onChanged: (val) => setState(() {
+                        selectedLocationShop = val!;
+                      }),
+                    ),
+                  ),
+
+                  const Divider(color: Colors.white54),
+                  _sectionHeader("🕓 Date Posted"),
+                  ...distinctDates.map(
+                    (dateString) => _customRadioTile(
+                      context: context,
+                      title: dateString,
+                      value: dateString,
+                      groupValue: selectedStatusProduct,
+                      onChanged: (val) => setState(() {
+                        selectedStatusProduct = val!;
+                      }),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.done),
+                        label: const Text("Apply"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.tealAccent[700],
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            selectedFilter = {
+                              'selectedPrice': selectedPrice,
+                              'selectedProductListType':
+                                  selectedProductListType,
+                              'selectedShopName': selectedShopName,
+                              'selectedLocationShop': selectedLocationShop,
+                              'selectedStatusProduct': selectedStatusProduct,
+                              'selectedBrands': selectedBrands,
+                              'selectedStar': selectedStar,
+                            };
+
+                            productList = productList_Origin
+                                .map((e) => e.copy())
+                                .toList();
+
+                            if (selectedPrice.isNotEmpty) {
+                              switch (selectedPrice) {
+                                case 'Below 1M':
+                                  productList = productList
+                                      .where(
+                                        (element) => element.price < 1000000,
+                                      )
+                                      .toList();
+                                  break;
+                                case '1M - 3M':
+                                  productList = productList
+                                      .where(
+                                        (element) =>
+                                            element.price >= 1000000 &&
+                                            element.price <= 3000000,
+                                      )
+                                      .toList();
+
+                                  break;
+                                case '3M - 5M':
+                                  productList = productList
+                                      .where(
+                                        (element) =>
+                                            element.price >= 3000000 &&
+                                            element.price <= 5000000,
+                                      )
+                                      .toList();
+
+                                  break;
+                                case '5M - 10M':
+                                  productList = productList
+                                      .where(
+                                        (element) =>
+                                            element.price >= 5000000 &&
+                                            element.price <= 10000000,
+                                      )
+                                      .toList();
+
+                                  break;
+                                case 'Above 10M':
+                                  productList = productList
+                                      .where(
+                                        (element) => element.price > 10000000,
+                                      )
+                                      .toList();
+
+                                  break;
+                              }
+                            }
+
+                            if (selectedProductListType.isNotEmpty) {
+                              if (selectedProductListType == 'Recommended') {
+                                ProductDetail maxSoldsProduct = productList
+                                    .reduce(
+                                      (curr, next) =>
+                                          curr.solds > next.solds ? curr : next,
+                                    );
+                                ProductDetail minSoldsProduct = productList
+                                    .reduce(
+                                      (curr, next) =>
+                                          curr.solds < next.solds ? curr : next,
+                                    );
+
+                                int averageSolds =
+                                    ((maxSoldsProduct.solds +
+                                                minSoldsProduct.solds) /
+                                            2)
+                                        as int;
+                                productList = productList
+                                    .where(
+                                      (element) =>
+                                          element.solds >= averageSolds,
+                                    )
+                                    .toList();
+                              } else {
+                                productList = productList
+                                    .where((element) => element.discount > 0)
+                                    .toList();
+                              }
+                            }
+
+                            if (selectedShopName.isNotEmpty) {
+                              productList = productList
+                                  .where(
+                                    (element) =>
+                                        element.shop ==
+                                        selectedFilter['selectedShopName'],
+                                  )
+                                  .toList();
+                            }
+
+                            if (selectedLocationShop.isNotEmpty) {
+                              productList = productList
+                                  .where(
+                                    (element) =>
+                                        element.location ==
+                                        selectedFilter['selectedLocationShop'],
+                                  )
+                                  .toList();
+                            }
+
+                            if (selectedStatusProduct.isNotEmpty) {
+                              productList = productList
+                                  .where(
+                                    (element) =>
+                                        element.date ==
+                                        selectedFilter['selectedStatusProduct'],
+                                  )
+                                  .toList();
+                            }
+
+                            if (selectedBrands.isNotEmpty) {
+                              productList = productList
+                                  .where(
+                                    (element) =>
+                                        selectedBrands.contains(element.brand),
+                                  )
+                                  .toList();
+                            }
+
+                            if (selectedStar != 0) {
+                              productList = productList
+                                  .where(
+                                    (element) =>
+                                        element.rate <= selectedStar.toDouble(),
+                                  )
+                                  .toList();
+                            }
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+
+                      const SizedBox(width: 5),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.done),
+                        label: const Text("Reset"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.tealAccent[700],
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            selectedFilter = {
+                              'selectedPrice': '',
+                              'selectedProductListType': '',
+                              'selectedShopName': '',
+                              'selectedLocationShop': '',
+                              'selectedStatusProduct': '',
+                              'selectedBrands': [],
+                              'selectedStar': 0,
+                            };
+                            productList = productList_Origin
+                                .map((e) => e.copy())
+                                .toList();
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -322,10 +526,10 @@ class _ProductTechPageState extends State<ProductTechPage>
   late Future<void> _loadDataFuture;
 
   Future<void> loadData() async {
-    productList = widget.productList.isEmpty
+    productList_Origin = widget.productList.isEmpty
         ? await FirebaseCloundService.getAllProducts()
         : widget.productList;
-    productList_Origin = await FirebaseCloundService.getAllProducts();
+    productList = productList_Origin.map((e) => e.copy()).toList();
   }
 
   @override
@@ -451,8 +655,17 @@ class _ProductTechPageState extends State<ProductTechPage>
         selectedColor: Colors.deepOrange,
         onSelected: (_) {
           setState(() {
+            selectedFilter = {
+              'selectedPrice': '',
+              'selectedProductListType': '',
+              'selectedShopName': '',
+              'selectedLocationShop': '',
+              'selectedStatusProduct': '',
+              'selectedBrands': [],
+              'selectedStar': 0,
+            };
             selectedSort = label;
-            productList = productList_Origin;
+            productList = productList_Origin.map((e) => e.copy()).toList();
             switch (label) {
               case "Delivery Today":
                 productList = productList
@@ -484,9 +697,6 @@ class _ProductTechPageState extends State<ProductTechPage>
   }
 
   Widget _buildPriceToggleChip() {
-    final isIncrease = selectedSort == 'Prices gradually increase';
-    final isDecrease = selectedSort == 'Prices gradually decrease';
-
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: ChoiceChip(
@@ -494,7 +704,11 @@ class _ProductTechPageState extends State<ProductTechPage>
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              isIncrease ? Icons.arrow_upward : Icons.arrow_downward,
+              selectedSort != 'increase' && selectedSort != 'decrease'
+                  ? Icons.horizontal_rule_outlined
+                  : (selectedSort == 'increase'
+                        ? Icons.arrow_upward
+                        : Icons.arrow_downward),
               color: Colors.white,
               size: 16,
             ),
@@ -502,21 +716,40 @@ class _ProductTechPageState extends State<ProductTechPage>
             const Text("Price", style: TextStyle(color: Colors.white)),
           ],
         ),
-        selected: isIncrease || isDecrease,
-        selectedColor: Colors.deepOrange,
+        selected: true,
+        selectedColor: selectedSort != 'increase' && selectedSort != 'decrease'
+            ? Colors.blueGrey
+            : Colors.deepOrange,
         backgroundColor: Colors.blueGrey,
         onSelected: (_) {
           setState(() {
-            productList = productList_Origin;
-            if (!isIncrease && !isDecrease) {
-              selectedSort = 'Prices gradually increase';
-              quickSort(productList, 0, productList.length - 1);
-            } else if (isIncrease) {
-              selectedSort = 'Prices gradually decrease';
-              quickSortDescending(productList, 0, productList.length - 1);
-            } else {
-              selectedSort = 'None';
-              productList = productList_Origin;
+            selectedFilter = {
+              'selectedPrice': '',
+              'selectedProductListType': '',
+              'selectedShopName': '',
+              'selectedLocationShop': '',
+              'selectedStatusProduct': '',
+              'selectedBrands': [],
+              'selectedStar': 0,
+            };
+            productList = productList_Origin.map((e) => e.copy()).toList();
+
+            switch (selectedSort) {
+              case 'none':
+                quickSort(productList, 0, productList.length - 1);
+                selectedSort = 'increase';
+                break;
+              case 'increase':
+                quickSortDescending(productList, 0, productList.length - 1);
+                selectedSort = 'decrease';
+                break;
+              case 'decrease':
+                selectedSort = 'none';
+                break;
+              default:
+                quickSort(productList, 0, productList.length - 1);
+                selectedSort = 'increase';
+                break;
             }
           });
         },

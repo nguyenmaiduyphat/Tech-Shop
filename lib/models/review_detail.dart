@@ -14,4 +14,25 @@ class ReviewDetail {
     required this.avatar,
     required this.user,
   });
+  Map<String, dynamic> toMap() {
+    return {
+      'idProduct': idProduct,
+      'content': content,
+      'rate': rate,
+      'image': image,
+      'avatar': avatar,
+      'user': user,
+    };
+  }
+
+  factory ReviewDetail.fromMap(Map<String, dynamic> map) {
+    return ReviewDetail(
+      idProduct: map['idProduct'] ?? '',
+      content: map['content'] ?? '',
+      rate: (map['rate'] ?? 0).toDouble(),
+      image: map['image'] ?? '',
+      avatar: map['avatar'] ?? '',
+      user: map['user'] ?? '',
+    );
+  }
 }

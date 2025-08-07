@@ -11,6 +11,8 @@ class ProductDetail {
   late String description;
   late Map<String, dynamic> detail;
   late String shop;
+  late String brand;
+  late String date;
 
   ProductDetail({
     required this.id,
@@ -25,7 +27,28 @@ class ProductDetail {
     required this.description,
     required this.detail,
     required this.shop,
+    required this.brand,
+    required this.date,
   });
+
+  ProductDetail copy() {
+    return ProductDetail(
+      id: id,
+      name: name,
+      images: List<String>.from(images), // deep copy of list
+      price: price,
+      discount: discount,
+      rate: rate,
+      deliveryDays: deliveryDays,
+      solds: solds,
+      location: location,
+      description: description,
+      detail: Map<String, dynamic>.from(detail), // deep copy of map
+      shop: shop,
+      brand: brand,
+      date: date,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -41,6 +64,8 @@ class ProductDetail {
       'description': description,
       'detail': detail,
       'shop': shop,
+      'brand': brand,
+      'date': date,
     };
   }
 
@@ -58,6 +83,8 @@ class ProductDetail {
       description: map['description'] ?? '',
       detail: Map<String, dynamic>.from(map['detail'] ?? {}),
       shop: map['shop'] ?? '',
+      brand: map['brand'] ?? '',
+      date: map['date'] ?? '',
     );
   }
 }

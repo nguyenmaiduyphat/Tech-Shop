@@ -8,6 +8,7 @@ import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
+import 'package:tech_fun/views/mid/product_tech_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -151,7 +152,24 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
-                onSubmitted: (value) {},
+                onSubmitted: (value) async {
+                  List<ProductDetail> list =
+                      await FirebaseCloundService.getAllProducts();
+
+                  list = list
+                      .where(
+                        (element) => element.name.toLowerCase().contains(
+                          value.toLowerCase().trim(),
+                        ),
+                      )
+                      .toList();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductTechPage(productList: list),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -664,7 +682,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   bool _isExpanded = false;
   Widget _buildProductDescription() {
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

@@ -5,6 +5,7 @@ import 'package:animation_list/animation_list.dart';
 import 'package:flutter/material.dart';
 import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
+import 'package:tech_fun/utils/formatcurrency.dart';
 import 'package:tech_fun/views/mid/edit_product_page.dart';
 import 'package:tech_fun/views/mid/post_detail_page.dart';
 import 'package:tech_fun/views/mid/post_store_page.dart';
@@ -265,7 +266,7 @@ class _MyStorePageState extends State<MyStorePage> {
                     ),
                   ),
                   subtitle: Text(
-                    '\$${item.price.toString()}',
+                    formatCurrency(item.price),
                     style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   trailing: GestureDetector(
