@@ -301,14 +301,30 @@ class _InformPageState extends State<InformPage> {
                         return;
                       }
                       // Login Success
-                      setState(() {
-                        SecureStorageService.currentUser =
-                            _usernamecontroller_login.text;
-                      });
+
                       await SecureStorageService.save(
                         SecureStorageService.keyName,
-                        SecureStorageService.currentUser,
+                        _usernamecontroller_login.text,
                       );
+
+                      if (SecureStorageService.user == null) {
+                        await SecureStorageService.save(
+                          SecureStorageService.keyName,
+                          SecureStorageService.offlineStatus,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Your email is not exist"),
+                          ),
+                        );
+                        return;
+                      } else {
+                        setState(() {
+                          SecureStorageService.currentUser =
+                              _usernamecontroller_login.text;
+                        });
+                      }
+
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => LayoutPage()),

@@ -5,7 +5,6 @@ import 'package:tech_fun/models/post_info.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class PostStorePage extends StatefulWidget {
-
   const PostStorePage({super.key});
 
   @override
@@ -13,76 +12,7 @@ class PostStorePage extends StatefulWidget {
 }
 
 class _MyPostsPageState extends State<PostStorePage> {
-  List<PostInfo> posts = [
-    PostInfo(
-      emojiTotal: 123,
-      commentTotal: 15,
-      shareTotal: 8,
-      currentIcon: '❤️',
-      avatarUser: 'assets/avatar/user1.jpg',
-      nameUser: 'Alice Nguyen',
-      datePost: '2025-07-27',
-      title: 'Unboxing My New Smartwatch ⌚',
-      content:
-          'I just got this beautiful GPS smartwatch and it’s packed with features. Heart rate monitor, sleep tracking, notifications… Loving it!',
-      imageContent: ['assets/product/product1.jpg'],
-      comments: ['Looks great!', 'Where did you get it?', 'Nice pick!'],
-    ),
-    PostInfo(
-      emojiTotal: 87,
-      commentTotal: 22,
-      shareTotal: 5,
-      currentIcon: '🔥',
-      avatarUser: 'assets/avatar/user1.jpg',
-      nameUser: 'David Tran',
-      datePost: '2025-07-26',
-      title: 'Upgraded My Gaming Setup 🎮',
-      content:
-          'New curved 4K monitor, mechanical keyboard, and a fresh RGB mouse. Gaming feels on another level!',
-      imageContent: [
-        'assets/product/product1.jpg',
-        'assets/product/product1.jpg',
-      ],
-      comments: ['Jealous!', 'That lighting is insane!', 'Specs?'],
-    ),
-    PostInfo(
-      emojiTotal: 256,
-      commentTotal: 40,
-      shareTotal: 14,
-      currentIcon: '👍',
-      avatarUser: 'assets/avatar/user1.jpg',
-      nameUser: 'Sara Lê',
-      datePost: '2025-07-25',
-      title: 'Fitness Mode On 🏃‍♀️',
-      content:
-          'Started my fitness journey with new ergonomic shoes. Super comfy and perfect for long runs!',
-      imageContent: ['assets/product/product1.jpg'],
-      comments: [
-        'You go girl!',
-        'What brand are those?',
-        'Let’s run together!',
-      ],
-    ),
-    PostInfo(
-      emojiTotal: 52,
-      commentTotal: 9,
-      shareTotal: 3,
-      currentIcon: '😄',
-      avatarUser: 'assets/avatar/user1.jpg',
-      nameUser: 'Minh Hoàng',
-      datePost: '2025-07-24',
-      title: 'Weekend Chill with Music 🎵',
-      content:
-          'Bought a portable Bluetooth speaker—perfect for outdoor vibes. Battery lasts 12+ hours!',
-      imageContent: [
-        'assets/product/product1.jpg',
-        'assets/product/product1.jpg',
-        'assets/product/product1.jpg',
-        'assets/product/product1.jpg',
-      ],
-      comments: ['Awesome!', 'I want one too!', 'Bass quality?'],
-    ),
-  ];
+  List<PostInfo> posts = [];
 
   @override
   Widget build(BuildContext context) {
@@ -238,10 +168,7 @@ class _MyPostsPageState extends State<PostStorePage> {
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              LayoutPage(),
-                        ),
+                        MaterialPageRoute(builder: (context) => LayoutPage()),
                       );
                     },
                   ),
@@ -325,7 +252,7 @@ class _MyPostsPageState extends State<PostStorePage> {
                     avatarUser: '',
                     nameUser: '',
                     datePost: '',
-                    comments: [],
+                    id: '',
                   );
                 } else {
                   posts.add(
@@ -340,7 +267,7 @@ class _MyPostsPageState extends State<PostStorePage> {
                       nameUser: '',
                       datePost: '',
                       imageContent: [],
-                      comments: [],
+                      id: '',
                     ),
                   );
                 }

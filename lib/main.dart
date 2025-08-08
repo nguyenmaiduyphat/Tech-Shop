@@ -21,7 +21,15 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SecureStorageService.init();
   //await addData();
+  final List<PostInfo> myPosts = generatePosts();
+  for (var x in myPosts) {
+    await FirebaseCloundService.addPost(x);
+  }
 
+  final List<ReviewDetail> myReviews = generateReviews();
+  for (var x in myReviews) {
+    await FirebaseCloundService.addReview(x);
+  }
   runApp(const MyApp());
 }
 
@@ -31,8 +39,13 @@ Future<void> addData() async {
     await FirebaseCloundService.addProduct(product);
   }
 
-  final List<CommentDetail> myComments = generateSampleComments(50);
+  final List<CommentDetail> myComments = generateSampleComments_Post(50);
   for (var comment in myComments) {
+    await FirebaseCloundService.addComment(comment);
+  }
+
+  final List<CommentDetail> myComments_news = generateSampleComments_News(50);
+  for (var comment in myComments_news) {
     await FirebaseCloundService.addComment(comment);
   }
 

@@ -7,7 +7,10 @@ import 'package:tech_fun/components/assetgallery.dart';
 import 'package:tech_fun/components/commentsection.dart';
 import 'package:tech_fun/components/hovericonbutton.dart';
 import 'package:tech_fun/components/reactionbutton.dart';
+import 'package:tech_fun/models/comment_detail.dart';
 import 'package:tech_fun/models/post_info.dart';
+import 'package:tech_fun/utils/database_service.dart';
+import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PostCard extends StatefulWidget {
@@ -22,7 +25,7 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   late final ScrollController _listScrollController;
   final TextEditingController _commentController = TextEditingController();
-  final ValueNotifier<List<String>> commentsNotifier = ValueNotifier([]);
+  final ValueNotifier<List<CommentDetail>> commentsNotifier = ValueNotifier([]);
 
   final List<List<Color>> gradientColors = [
     [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
@@ -33,11 +36,19 @@ class _PostCardState extends State<PostCard> {
 
   int _currentGradientIndex = 0;
   bool hasLoad = false;
+
+  late Future<void> _loadDataFuture;
+
+  Future<void> loadData() async {
+    commentsNotifier.value = await FirebaseCloundService.getAllComments(
+      widget.postInfo.id,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    commentsNotifier.value = List.from(widget.postInfo.comments);
-
+    _loadDataFuture = loadData();
     _listScrollController = ScrollController();
     _startGradientLoop();
   }
@@ -61,14 +72,38 @@ class _PostCardState extends State<PostCard> {
     super.dispose();
   }
 
-  void _submitComment() {
+  Future<void> _submitComment() async {
+    if (SecureStorageService.currentUser.toString() ==
+        SecureStorageService.offlineStatus.toString()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('You must login to comment this post')),
+      );
+      return;
+    }
+
     final text = _commentController.text.trim();
     if (text.isNotEmpty) {
-      final updated = List<String>.from(commentsNotifier.value)..add(text);
-      commentsNotifier.value = updated;
+      final updated = List<CommentDetail>.from(commentsNotifier.value)
+        ..add(
+          CommentDetail(
+            id: widget.postInfo.id,
+            content: text,
+            avatar: 'assets/user/user1.jpg',
+            user: SecureStorageService.user!.email,
+          ),
+        );
+
+      await FirebaseCloundService.addComment(
+        CommentDetail(
+          id: widget.postInfo.id,
+          content: text,
+          avatar: 'assets/user/user1.jpg',
+          user: SecureStorageService.user!.email,
+        ),
+      );
 
       setState(() {
-        widget.postInfo.comments.add(text);
+        commentsNotifier.value = updated;
         widget.postInfo.commentTotal++;
       });
       _commentController.clear();
@@ -86,58 +121,74 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: AnimatedContainer(
-        duration: const Duration(seconds: 2),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: gradientColors[_currentGradientIndex],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildUserHeader(context),
-                const SizedBox(height: 8),
-                Text(
-                  widget.postInfo.title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.white,
+    return FutureBuilder(
+      future: _loadDataFuture,
+      builder: (context, asyncSnapshot) {
+        switch (asyncSnapshot.connectionState) {
+          case ConnectionState.waiting:
+            return Text('Loading....');
+          default:
+            if (asyncSnapshot.hasError)
+              return Text('Error: ${asyncSnapshot.error}');
+            else {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: AnimatedContainer(
+                  duration: const Duration(seconds: 2),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: gradientColors[_currentGradientIndex],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildUserHeader(context),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.postInfo.title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            widget.postInfo.content,
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          const SizedBox(height: 10),
+                          AssetGallery(
+                            assetImagePaths: widget.postInfo.imageContent,
+                          ),
+                          const SizedBox(height: 8),
+                          _buildStatsRow(),
+                          const Divider(height: 24, color: Colors.white24),
+                          _buildReactionBar(context),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  widget.postInfo.content,
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 10),
-                AssetGallery(assetImagePaths: widget.postInfo.imageContent),
-                const SizedBox(height: 8),
-                _buildStatsRow(),
-                const Divider(height: 24, color: Colors.white24),
-                _buildReactionBar(context),
-              ],
-            ),
-          ),
-        ),
-      ),
+              );
+            }
+        }
+      },
     );
   }
 

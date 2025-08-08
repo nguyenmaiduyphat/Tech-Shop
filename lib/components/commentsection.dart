@@ -1,8 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:tech_fun/models/comment_detail.dart';
 
 class CommentSection extends StatelessWidget {
-  final ValueNotifier<List<String>> commentsNotifier;
+  final ValueNotifier<List<CommentDetail>> commentsNotifier;
   final ScrollController scrollController;
   final TextEditingController commentController;
   final void Function() onSubmit;
@@ -50,7 +51,7 @@ class CommentSection extends StatelessWidget {
           child: Container(
             width: double.infinity,
             color: const Color(0xFF1C2331), // Slightly lighter tech color
-            child: ValueListenableBuilder<List<String>>(
+            child: ValueListenableBuilder<List<CommentDetail>>(
               valueListenable: commentsNotifier,
               builder: (context, comments, _) {
                 return ScrollConfiguration(
@@ -65,15 +66,15 @@ class CommentSection extends StatelessWidget {
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        leading: const CircleAvatar(
-                          backgroundImage: AssetImage("assets/user/user1.jpg"),
+                        leading: CircleAvatar(
+                          backgroundImage: AssetImage(comments[index].avatar),
                         ),
                         title: Text(
-                          "User ${index + 1}",
+                          comments[index].user,
                           style: const TextStyle(color: Colors.white),
                         ),
                         subtitle: Text(
-                          comments[index],
+                          comments[index].content,
                           style: const TextStyle(color: Colors.white70),
                         ),
                       );

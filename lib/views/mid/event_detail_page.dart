@@ -1,14 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:tech_fun/models/event_detail.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/event_page.dart';
 
 class EventDetailPage extends StatefulWidget {
-  final EventStatus eventStatus;
-  const EventDetailPage({
-    super.key,
-    required this.eventStatus,
-  });
+  final EventDetail eventDetail;
+  const EventDetailPage({super.key, required this.eventDetail});
 
   @override
   State<EventDetailPage> createState() => _EventDetailPageState();
@@ -17,16 +15,6 @@ class EventDetailPage extends StatefulWidget {
 class _EventDetailPageState extends State<EventDetailPage>
     with TickerProviderStateMixin {
   bool isExpanded = false;
-  // Sample event data
-  final String eventTitle = 'Flutter Global Summit 2025';
-  final String eventDescription = List.generate(
-    60,
-    (i) => 'Event Detail Line ${i + 1}',
-  ).join('\n');
-  final String organizer = 'TechFun Global';
-  final String dateTime = 'Aug 12, 2025 – 9:00 AM to 5:00 PM';
-  final String location = 'San Francisco Convention Center';
-  int attendees = 157;
 
   late final AnimationController _bgController;
   late final Animation<Color?> _color1;
@@ -105,7 +93,7 @@ class _EventDetailPageState extends State<EventDetailPage>
                     children: [
                       // DateTime
                       Text(
-                        dateTime,
+                        widget.eventDetail.date,
                         style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -115,7 +103,7 @@ class _EventDetailPageState extends State<EventDetailPage>
 
                       // Title
                       Text(
-                        eventTitle,
+                        widget.eventDetail.title,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -126,7 +114,7 @@ class _EventDetailPageState extends State<EventDetailPage>
 
                       // Organizer & Location
                       Text(
-                        'Organized by $organizer',
+                        'Organized by ${widget.eventDetail.owner}',
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 4),
@@ -140,7 +128,7 @@ class _EventDetailPageState extends State<EventDetailPage>
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              location,
+                              widget.eventDetail.location,
                               style: const TextStyle(color: Colors.grey),
                             ),
                           ),
@@ -158,7 +146,7 @@ class _EventDetailPageState extends State<EventDetailPage>
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '$attendees attendees',
+                            '${widget.eventDetail.attendees} attendees',
                             style: const TextStyle(color: Colors.white70),
                           ),
                         ],
@@ -179,7 +167,7 @@ class _EventDetailPageState extends State<EventDetailPage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              eventDescription,
+                              widget.eventDetail.content,
                               maxLines: isExpanded ? null : 20,
                               overflow: isExpanded
                                   ? TextOverflow.visible
@@ -205,40 +193,6 @@ class _EventDetailPageState extends State<EventDetailPage>
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
-
-                      if (widget.eventStatus == EventStatus.none) ...[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  attendees++;
-                                  Navigator.pop(context, EventStatus.joined);
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                minimumSize: const Size(120, 44),
-                              ),
-                              child: const Text('Join'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  Navigator.pop(context, EventStatus.refused);
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                minimumSize: const Size(120, 44),
-                              ),
-                              child: const Text('Refuse'),
-                            ),
-                          ],
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -253,10 +207,7 @@ class _EventDetailPageState extends State<EventDetailPage>
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            LayoutPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => LayoutPage()),
                     );
                   },
                 ),

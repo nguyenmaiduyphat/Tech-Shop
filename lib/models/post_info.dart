@@ -1,10 +1,13 @@
+import 'package:tech_fun/models/comment_detail.dart';
+
 class PostInfo {
+  final String id;
   late int emojiTotal, commentTotal, shareTotal;
   late String currentIcon;
   final String avatarUser, nameUser, datePost, title, content;
   final List<String> imageContent;
-  final List<String> comments;
   PostInfo({
+    required this.id,
     required this.emojiTotal,
     required this.commentTotal,
     required this.shareTotal,
@@ -15,10 +18,10 @@ class PostInfo {
     required this.title,
     required this.content,
     required this.imageContent,
-    required this.comments,
   });
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'emojiTotal': emojiTotal,
       'commentTotal': commentTotal,
       'shareTotal': shareTotal,
@@ -29,12 +32,12 @@ class PostInfo {
       'title': title,
       'content': content,
       'imageContent': imageContent,
-      'comments': comments,
     };
   }
 
   factory PostInfo.fromMap(Map<String, dynamic> map) {
     return PostInfo(
+      id: map['id'] ?? 0,
       emojiTotal: map['emojiTotal'] ?? 0,
       commentTotal: map['commentTotal'] ?? 0,
       shareTotal: map['shareTotal'] ?? 0,
@@ -45,7 +48,6 @@ class PostInfo {
       title: map['title'] ?? '',
       content: map['content'] ?? '',
       imageContent: List<String>.from(map['imageContent'] ?? []),
-      comments: List<String>.from(map['comments'] ?? []),
     );
   }
 }

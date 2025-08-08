@@ -42,6 +42,19 @@ class FirebaseCloundService {
         });
   }
 
+  static Future<UserDetail?> getUserByEmail(String email) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection(NameTable.USERS.name)
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return UserDetail.fromMap(snapshot.docs.first.data());
+    }
+    return null;
+  }
+
   static Future<void> updateUser(UserDetail user) async {
     try {
       final query = await FirebaseFirestore.instance
@@ -139,14 +152,34 @@ class FirebaseCloundService {
     await _firestore.collection(NameTable.COMMENTS.name).add(comment.toMap());
   }
 
+  static Future<List<CommentDetail>> getAllComments(String id) async {
+    final snapshot = await _firestore
+        .collection(NameTable.COMMENTS.name)
+        .where('id', isEqualTo: id)
+        .get();
+    return snapshot.docs
+        .map((doc) => CommentDetail.fromMap(doc.data()))
+        .toList();
+  }
+
   /// EVENTS
   static Future<void> addEvent(EventDetail event) async {
     await _firestore.collection(NameTable.EVENTS.name).add(event.toMap());
   }
 
+  static Future<List<EventDetail>> getAllEvents() async {
+    final snapshot = await _firestore.collection(NameTable.EVENTS.name).get();
+    return snapshot.docs.map((doc) => EventDetail.fromMap(doc.data())).toList();
+  }
+
   /// NEWS
   static Future<void> addNews(NewsDetail news) async {
     await _firestore.collection(NameTable.NEWS.name).add(news.toMap());
+  }
+
+  static Future<List<NewsDetail>> getAllNews() async {
+    final snapshot = await _firestore.collection(NameTable.NEWS.name).get();
+    return snapshot.docs.map((doc) => NewsDetail.fromMap(doc.data())).toList();
   }
 
   /// ORDERS
@@ -164,6 +197,14 @@ class FirebaseCloundService {
     return snapshot.docs.map((doc) => PostInfo.fromMap(doc.data())).toList();
   }
 
+  static Future<List<PostInfo>> getAllPostsWithEmail(String email) async {
+    final snapshot = await _firestore
+        .collection(NameTable.POSTS.name)
+        .where('nameUser', isEqualTo: email)
+        .get();
+    return snapshot.docs.map((doc) => PostInfo.fromMap(doc.data())).toList();
+  }
+
   /// REVIEWS
   static Future<void> addReview(ReviewDetail review) async {
     await _firestore.collection(NameTable.REVIEWS.name).add(review.toMap());
@@ -172,6 +213,33 @@ class FirebaseCloundService {
   /// SHOPS
   static Future<void> addShop(ShopDetail shop) async {
     await _firestore.collection(NameTable.STORE.name).add(shop.toMap());
+  }
+
+  // ✅ Get shop by `id` field
+  static Future<ShopDetail?> getShopById(String email) async {
+    final snapshot = await _firestore
+        .collection(NameTable.STORE.name)
+        .where('user', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return ShopDetail.fromMap(snapshot.docs.first.data());
+    }
+    return null;
+  }
+
+  // ✅ Update shop by `id` field
+  static Future<void> updateShop(String shopId, ShopDetail shop) async {
+    final snapshot = await _firestore
+        .collection(NameTable.STORE.name)
+        .where('id', isEqualTo: shopId)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      await snapshot.docs.first.reference.update(shop.toMap());
+    }
   }
 }
 

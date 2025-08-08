@@ -76,10 +76,30 @@ final List<String> sampleUsers = [
   "Hoang Van E",
 ];
 
-List<CommentDetail> generateSampleComments(int count) {
+final List<String> sampleShopNames = [
+  "GearVN",
+  "Adidas",
+  "Yashigi",
+  "V Lieng King",
+  "TopTier",
+  "BingGoAnt",
+];
+
+List<CommentDetail> generateSampleComments_Post(int count) {
   return List.generate(count, (index) {
     return CommentDetail(
-      id: 'comment_$index',
+      id: 'P$index',
+      content: sampleContents[random.nextInt(sampleContents.length)],
+      avatar: 'assets/user/user1.jpg',
+      user: sampleUsers[random.nextInt(sampleUsers.length)],
+    );
+  });
+}
+
+List<CommentDetail> generateSampleComments_News(int count) {
+  return List.generate(count, (index) {
+    return CommentDetail(
+      id: 'N$index',
       content: sampleContents[random.nextInt(sampleContents.length)],
       avatar: 'assets/user/user1.jpg',
       user: sampleUsers[random.nextInt(sampleUsers.length)],
@@ -103,12 +123,13 @@ List<UserDetail> generateUsers() => List.generate(50, (i) {
 
 List<PostInfo> generatePosts() => List.generate(50, (i) {
   return PostInfo(
+    id: 'P$i',
     emojiTotal: random.nextInt(1000),
     commentTotal: random.nextInt(300),
     shareTotal: random.nextInt(100),
     currentIcon: '⚫',
     avatarUser: 'assets/user/user1.jpg',
-    nameUser: 'User $i',
+    nameUser: 'user$i@gmail.com',
     datePost: '202${i % 10}-01-01',
     title: 'Post Title $i',
     content: 'This is the content of post $i.',
@@ -121,7 +142,6 @@ List<PostInfo> generatePosts() => List.generate(50, (i) {
       'assets/product/product6.jpg',
       'assets/product/product7.jpg',
     ],
-    comments: List.generate(random.nextInt(5), (j) => 'Comment $j'),
   );
 });
 
@@ -132,7 +152,7 @@ List<ReviewDetail> generateReviews() => List.generate(50, (i) {
     rate: (random.nextInt(5) + random.nextDouble()).clamp(1.0, 5.0),
     image: 'assets/product/product1.jpg',
     avatar: 'assets/user/user1.jpg',
-    user: 'User $i',
+    user: 'user$i@gmail.com',
   );
 });
 
@@ -147,7 +167,8 @@ List<CommentDetail> generateComments() => List.generate(50, (i) {
 
 List<ShopDetail> generateShops() => List.generate(50, (i) {
   return ShopDetail(
-    name: 'Shop $i',
+    name: i < sampleShopNames.length - 1 ? sampleShopNames[i] : 'Shop $i',
+    user: 'user$i@gmail.com',
     orderBoughtTotal: random.nextInt(1000),
     productTotal: random.nextInt(200),
     postTotal: random.nextInt(50),

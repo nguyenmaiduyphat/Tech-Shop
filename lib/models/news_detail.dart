@@ -4,9 +4,9 @@ class NewsDetail {
   final String content;
   final String owner;
   final String date;
-  final int views;
-  final int likes;
-  final int dislikes;
+  late int views;
+  late int likes;
+  late int dislikes;
   final String id;
 
   NewsDetail({

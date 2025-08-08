@@ -1,10 +1,13 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:tech_fun/models/user_detail.dart';
+import 'package:tech_fun/utils/database_service.dart';
+import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class ProfilePage extends StatefulWidget {
-
   const ProfilePage({super.key});
 
   @override
@@ -17,31 +20,18 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isEditing = false;
   bool _hasChanges = false;
 
-  final TextEditingController _usernameController = TextEditingController(
-    text: 'john_doe',
+  TextEditingController _usernameController = TextEditingController(text: '');
+  TextEditingController _passwordController = TextEditingController(text: '');
+  TextEditingController _emailController = TextEditingController(text: '');
+  TextEditingController _phoneController = TextEditingController(text: '');
+  TextEditingController _addressController = TextEditingController(text: '');
+  TextEditingController _citizenIdController = TextEditingController(text: '');
+  TextEditingController _bankAccountController = TextEditingController(
+    text: '',
   );
-  final TextEditingController _passwordController = TextEditingController(
-    text: 'password123',
-  );
-  final TextEditingController _emailController = TextEditingController(
-    text: 'john@example.com',
-  );
-  final TextEditingController _phoneController = TextEditingController(
-    text: '0123456789',
-  );
-  final TextEditingController _addressController = TextEditingController(
-    text: '123 Main Street',
-  );
-  final TextEditingController _citizenIdController = TextEditingController(
-    text: '1234567890123',
-  );
-  final TextEditingController _bankAccountController = TextEditingController(
-    text: '9876543210',
-  );
-  final TextEditingController _birthdateController = TextEditingController();
+  TextEditingController _birthdateController = TextEditingController(text: '');
 
-  String? _gender = 'Male';
-  DateTime? _birthdate = DateTime(1990, 1, 1);
+  String gender = 'Male';
 
   late Map<String, dynamic> _initialValues;
 
@@ -49,13 +39,37 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _setInitialValues(); // Format birthdate to string
-    if (_birthdate != null) {
-      _birthdateController.text =
-          '${_birthdate!.day.toString().padLeft(2, '0')}/${_birthdate!.month.toString().padLeft(2, '0')}/${_birthdate!.year}';
+
+    if (SecureStorageService.user != null) {
+      _usernameController = TextEditingController(
+        text: SecureStorageService.user!.username,
+      );
+      _passwordController = TextEditingController(
+        text: SecureStorageService.user!.password,
+      );
+      _emailController = TextEditingController(
+        text: SecureStorageService.user!.email,
+      );
+      _phoneController = TextEditingController(
+        text: SecureStorageService.user!.phone,
+      );
+      _addressController = TextEditingController(
+        text: SecureStorageService.user!.address,
+      );
+      _citizenIdController = TextEditingController(
+        text: SecureStorageService.user!.CIC,
+      );
+      _bankAccountController = TextEditingController(
+        text: SecureStorageService.user!.bankNumber,
+      );
+      _birthdateController = TextEditingController(
+        text: SecureStorageService.user!.birth,
+      );
+      gender = SecureStorageService.user!.gender;
     }
   }
 
-  void _setInitialValues() {
+  Future<void> _setInitialValues() async {
     _initialValues = {
       'username': _usernameController.text,
       'password': _passwordController.text,
@@ -63,9 +77,23 @@ class _ProfilePageState extends State<ProfilePage> {
       'address': _addressController.text,
       'citizenId': _citizenIdController.text,
       'bankAccount': _bankAccountController.text,
-      'gender': _gender,
-      'birthdate': _birthdate,
+      'gender': gender,
+      'birthdate': _birthdateController.text,
     };
+
+    await FirebaseCloundService.updateUser(
+      UserDetail(
+        username: _usernameController.text,
+        password: _passwordController.text,
+        email: SecureStorageService.user!.email,
+        phone: _phoneController.text,
+        address: _addressController.text,
+        gender: gender,
+        birth: _birthdateController.text,
+        CIC: _citizenIdController.text,
+        bankNumber: _bankAccountController.text,
+      ),
+    );
   }
 
   void _checkForChanges() {
@@ -77,27 +105,9 @@ class _ProfilePageState extends State<ProfilePage> {
           _addressController.text != _initialValues['address'] ||
           _citizenIdController.text != _initialValues['citizenId'] ||
           _bankAccountController.text != _initialValues['bankAccount'] ||
-          _gender != _initialValues['gender'] ||
-          _birthdate != _initialValues['birthdate'];
+          gender != _initialValues['gender'] ||
+          _birthdateController.text != _initialValues['birthdate'];
     });
-  }
-
-  Future<void> _pickBirthdate() async {
-    if (!_isEditing) return;
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _birthdate ?? DateTime(2000),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _birthdate = picked;
-        _birthdateController.text =
-            '${_birthdate!.day.toString().padLeft(2, '0')}/${_birthdate!.month.toString().padLeft(2, '0')}/${_birthdate!.year}';
-        _checkForChanges();
-      });
-    }
   }
 
   void _toggleEditMode() {
@@ -110,8 +120,8 @@ class _ProfilePageState extends State<ProfilePage> {
         _addressController.text = _initialValues['address'];
         _citizenIdController.text = _initialValues['citizenId'];
         _bankAccountController.text = _initialValues['bankAccount'];
-        _gender = _initialValues['gender'];
-        _birthdate = _initialValues['birthdate'];
+        gender = _initialValues['gender'];
+        _birthdateController.text = _initialValues['birthdate'];
         _hasChanges = false;
       }
       _isEditing = !_isEditing;
@@ -170,10 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        LayoutPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => LayoutPage()),
                 );
               },
             ),
@@ -254,7 +261,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 DropdownButtonFormField<String>(
                   dropdownColor: Colors.grey[900],
-                  value: _gender,
+                  value: gender,
                   decoration: InputDecoration(
                     labelText: 'Gender',
                     labelStyle: const TextStyle(color: Colors.grey),
@@ -293,7 +300,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   onChanged: _isEditing
                       ? (value) {
                           setState(() {
-                            _gender = value;
+                            gender = value!;
                             _checkForChanges();
                           });
                         }
@@ -301,27 +308,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 12),
 
-                TextFormField(
-                  controller: _birthdateController,
-                  readOnly: true,
-                  onTap: _pickBirthdate,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Birthdate',
-                    labelStyle: const TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey[900],
-                    suffixIcon: _isEditing
-                        ? const Icon(Icons.calendar_today, color: Colors.white)
-                        : null,
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
-                ),
+                _buildTextField('Birth', controller: _birthdateController),
 
                 const SizedBox(height: 20),
 

@@ -321,7 +321,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                         SecureStorageService.offlineStatus.toString()
                     ? UserAvatar(
                         name: SecureStorageService.currentUser,
-                        rank: 'Diamond',
+                        rank: SecureStorageService.user!.gender,
                         onTap: () => _showLogoutDialog(context),
                       )
                     : Center(
@@ -401,7 +401,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
             TextButton(
               onPressed: () => Navigator.of(context).pop(), // NO
               child: Text(
-                "No, I stay",
+                "No, I'll stay",
                 style: TextStyle(color: Colors.grey[400]),
               ),
             ),
