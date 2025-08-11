@@ -1,7 +1,6 @@
 // ignore_for_file: deprecated_member_use, duplicate_ignore, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tech_fun/components/DrawerMenuItem.dart';

@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/models/review_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/product_tech_page.dart';
+import 'package:tech_fun/views/mid/review_Page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -30,6 +32,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   int _currentPage = 0;
   late Map<String, dynamic> productInfo;
   List<ProductDetail> productList = [];
+  List<ReviewDetail> reviewList = [];
 
   @override
   void initState() {
@@ -56,6 +59,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   Future<void> loadData() async {
     productList = await FirebaseCloundService.getAllProducts();
+    reviewList = await FirebaseCloundService.getAllReviewsWithIdProduct(
+      id: widget.productDetail.id,
+      amount: 5,
+    );
   }
 
   @override
@@ -601,23 +608,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   Widget _buildReviewList() {
-    final reviews = List.generate(
-      4,
-      (i) => {
-        'name': 'User $i',
-        'rating': 4 - (i % 3), // 4, 3, 2, 1
-        'content': 'Great product! Really satisfied with quality.',
-        'image': 'assets/product/product${(i % 3) + 1}.jpg',
-      },
-    );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ...reviews.map((review) {
-          final rating = review['rating'] as int;
-          final image = review['image'] as String;
-
+        ...reviewList.map((review) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: ListTile(
@@ -633,8 +627,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   Row(
                     children: List.generate(5, (index) {
                       return Icon(
-                        index < rating ? Icons.star : Icons.star_border,
-                        color: index < rating ? Colors.amber : Colors.grey,
+                        index < review.rate ? Icons.star : Icons.star_border,
+                        color: index < review.rate ? Colors.amber : Colors.grey,
                         size: 16,
                       );
                     }),
@@ -646,14 +640,14 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 children: [
                   const SizedBox(height: 4),
                   Text(
-                    review['content'].toString(),
+                    review.content,
                     style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 6),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.asset(
-                      image,
+                      review.image,
                       height: 100,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -668,7 +662,13 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           alignment: Alignment.centerRight,
           child: TextButton(
             onPressed: () {
-              // Navigate to full review list
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ReviewPage(product: widget.productDetail),
+                ),
+              );
             },
             child: const Text(
               'View all',

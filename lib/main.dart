@@ -21,15 +21,7 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SecureStorageService.init();
   //await addData();
-  final List<PostInfo> myPosts = generatePosts();
-  for (var x in myPosts) {
-    await FirebaseCloundService.addPost(x);
-  }
 
-  final List<ReviewDetail> myReviews = generateReviews();
-  for (var x in myReviews) {
-    await FirebaseCloundService.addReview(x);
-  }
   runApp(const MyApp());
 }
 

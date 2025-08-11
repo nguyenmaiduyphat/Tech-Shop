@@ -210,6 +210,28 @@ class FirebaseCloundService {
     await _firestore.collection(NameTable.REVIEWS.name).add(review.toMap());
   }
 
+  static Future<List<ReviewDetail>> getAllReviewsWithIdProduct({
+    required String id,
+    required int amount,
+  }) async {
+    QuerySnapshot<Map<String, dynamic>>? snapshot;
+    if (amount != 0) {
+      snapshot = await _firestore
+          .collection(NameTable.REVIEWS.name)
+          .where('idProduct', isEqualTo: id)
+          .limit(amount)
+          .get();
+    } else {
+      snapshot = await _firestore
+          .collection(NameTable.REVIEWS.name)
+          .where('idProduct', isEqualTo: id)
+          .get();
+    }
+    return snapshot.docs
+        .map((doc) => ReviewDetail.fromMap(doc.data()))
+        .toList();
+  }
+
   /// SHOPS
   static Future<void> addShop(ShopDetail shop) async {
     await _firestore.collection(NameTable.STORE.name).add(shop.toMap());

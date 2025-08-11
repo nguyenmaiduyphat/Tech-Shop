@@ -7,7 +7,6 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
-import 'package:tech_fun/utils/sort_methods.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class ProductTechPage extends StatefulWidget {

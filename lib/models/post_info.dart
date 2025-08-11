@@ -1,5 +1,3 @@
-import 'package:tech_fun/models/comment_detail.dart';
-
 class PostInfo {
   final String id;
   late int emojiTotal, commentTotal, shareTotal;

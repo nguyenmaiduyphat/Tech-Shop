@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:tech_fun/models/event_detail.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
-import 'package:tech_fun/views/mid/event_page.dart';
 
 class EventDetailPage extends StatefulWidget {
   final EventDetail eventDetail;
