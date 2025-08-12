@@ -22,6 +22,7 @@ Future<void> main() async {
   await SecureStorageService.init();
   //await addData();
 
+
   runApp(const MyApp());
 }
 
@@ -51,7 +52,7 @@ Future<void> addData() async {
     await FirebaseCloundService.addNews(x);
   }
 
-  final List<OrderDetail> myOrders = generateOrders();
+  final List<OrderDetail> myOrders = generateOrders([]);
   for (var x in myOrders) {
     await FirebaseCloundService.addOrder(x);
   }

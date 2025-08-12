@@ -2,7 +2,7 @@ class ProductDetail {
   final String id;
   late String name;
   late List<String> images;
-  late double price;
+  late int price;
   late double discount;
   late double rate;
   late int deliveryDays;

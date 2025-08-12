@@ -9,6 +9,9 @@ import 'package:tech_fun/models/event_detail.dart';
 import 'package:tech_fun/models/news_detail.dart';
 import 'package:tech_fun/models/order_detail.dart';
 import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/utils/database_service.dart';
+import 'package:tech_fun/utils/formatcurrency.dart';
+import 'package:tech_fun/utils/secure_storage_service.dart';
 
 final List<String> sampleImages = [
   "assets/product/product1.jpg",
@@ -33,7 +36,7 @@ List<ProductDetail> generateSampleProducts(int count) {
         3,
         (_) => sampleImages[random.nextInt(sampleImages.length)],
       ),
-      price: (random.nextInt(100000000 - 100000 + 1) + 100000).toDouble(),
+      price: (random.nextInt(100000000 - 100000 + 1) + 100000),
       discount: double.parse((random.nextDouble() * 30).toStringAsFixed(2)),
       rate: double.parse((random.nextDouble() * 5).toStringAsFixed(1)),
       deliveryDays: random.nextInt(7) + 1,
@@ -208,45 +211,61 @@ List<ReviewDetail> generateReviews() => List.generate(50, (i) {
   );
 });
 
-List<CommentDetail> generateComments() => List.generate(50, (i) {
-  return CommentDetail(
-    id: 'C$i',
-    content: 'This is comment number $i.',
-    avatar: 'assets/user/user1.jpg',
-    user: 'User $i',
-  );
-});
-
-List<ShopDetail> generateShops() => List.generate(50, (i) {
+List<ShopDetail> generateShops() => List.generate(sampleShops.length, (i) {
   return ShopDetail(
-    name: i < sampleShopNames.length - 1 ? sampleShopNames[i] : 'Shop $i',
+    name: sampleShops[i],
     user: 'user$i@gmail.com',
     orderBoughtTotal: random.nextInt(1000),
     productTotal: random.nextInt(200),
-    postTotal: random.nextInt(50),
+    postTotal: random.nextInt(200),
     revenueTotal: random.nextInt(1000000),
   );
 });
 
-List<OrderDetail> generateOrders() => List.generate(50, (i) {
-  final items = {
-    'P${random.nextInt(100)}': random.nextInt(5) + 1,
-    'P${random.nextInt(100)}': random.nextInt(3) + 1,
-  };
-  final total = items.entries.fold(
+List<OrderDetail> generateOrders(
+  List<ProductDetail> productList,
+) => List.generate(50, (i) {
+  final total = productList.fold(
     0,
-    (sum, entry) => sum + entry.value * 100000,
+    (sum, entry) => sum + entry.price * random.nextInt(50),
   );
   final discount = (random.nextDouble() * 66).toStringAsFixed(
     1,
   ); // 0.0 to 66.0%
+  int statusIndex = random.nextInt(3);
+  StatusOrder statusOrder = StatusOrder.None;
+
+  switch (statusOrder) {
+    case StatusOrder.Processing:
+      statusOrder = StatusOrder.Processing;
+      break;
+    case StatusOrder.Shipped:
+      statusOrder = StatusOrder.Shipped;
+      break;
+    case StatusOrder.Delivered:
+      statusOrder = StatusOrder.Delivered;
+      break;
+    case StatusOrder.None:
+      statusOrder = StatusOrder.None;
+      break;
+  }
+
   return OrderDetail(
-    user: 'User $i',
-    items: items,
+    user: 'user$i@gmail.com',
+    items: productList.take(random.nextInt(productList.length)).toList(),
     total: total,
     discount: double.parse(discount),
+    id: SecureStorageService.currentUser == SecureStorageService.offlineStatus
+        ? generateOrderCode()
+        : SecureStorageService.currentUser,
+    dateCreated: DateTime.now()
+        .subtract(Duration(days: random.nextInt(365)))
+        .year
+        .toString(),
+    status: statusOrder,
   );
 });
+
 List<NewsDetail> generateNews() => List.generate(50, (i) {
   return NewsDetail(
     image: 'assets/product/product1.jpg',

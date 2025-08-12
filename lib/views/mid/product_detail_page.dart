@@ -7,7 +7,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tech_fun/components/productcard_hovereffect.dart';
 import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/models/review_detail.dart';
+import 'package:tech_fun/models/shop_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
+import 'package:tech_fun/utils/formatcurrency.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/product_tech_page.dart';
 import 'package:tech_fun/views/mid/review_Page.dart';
@@ -56,12 +58,24 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   late Future<void> _loadDataFuture;
+  ShopDetail? shop = ShopDetail(
+    name: '',
+    user: 'user',
+    orderBoughtTotal: 0,
+    productTotal: 0,
+    postTotal: 0,
+    revenueTotal: 0,
+  );
 
   Future<void> loadData() async {
     productList = await FirebaseCloundService.getAllProducts();
     reviewList = await FirebaseCloundService.getAllReviewsWithIdProduct(
       id: widget.productDetail.id,
       amount: 5,
+    );
+
+    shop = await FirebaseCloundService.getShopByNameShop(
+      widget.productDetail.shop,
     );
   }
 
@@ -328,6 +342,18 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   bool _isFavorited = false;
 
   Widget _buildMainContent() {
+    final int postTotal = 48;
+    final DateTime shopCreatedAt = DateTime(2024, 6, 10);
+    final DateTime now = DateTime.now();
+
+    // Calculate days between creation and now
+    final int daysSinceCreated = now.difference(shopCreatedAt).inDays;
+
+    // Avoid division by zero
+    final double postRatePerDay = daysSinceCreated > 0
+        ? postTotal / daysSinceCreated
+        : postTotal.toDouble(); // If shop created today
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -338,7 +364,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '\$${widget.productDetail.price.toString()}',
+                formatCurrency(widget.productDetail.price),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -348,7 +374,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               Row(
                 children: [
                   Text(
-                    '${widget.productDetail.solds.toString()} sold',
+                    '${widget.productDetail.solds.toString()} solds',
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(width: 8),
@@ -395,11 +421,11 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                children: const [
+                children: [
                   Icon(Icons.star, color: Colors.amber, size: 18),
                   SizedBox(width: 4),
                   Text(
-                    '4.8 | 1.2k reviews',
+                    '${widget.productDetail.rate.toStringAsFixed(1)} | ${reviewList.length} reviews',
                     style: TextStyle(color: Colors.white),
                   ),
                 ],
@@ -433,7 +459,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
-                        'Online',
+                        widget.productDetail.location,
                         style: TextStyle(color: Colors.green, fontSize: 12),
                       ),
                     ],
@@ -475,10 +501,19 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           // Row 7: Shop stats
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('⭐ 4.9', style: TextStyle(color: Colors.white)),
-              Text('120 products', style: TextStyle(color: Colors.white)),
-              Text('95% reply rate', style: TextStyle(color: Colors.white)),
+            children: [
+              Text(
+                '⭐ ${widget.productDetail.rate.toStringAsFixed(1)}',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                '${shop!.productTotal.toString()} products',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                '${(100 / shop!.postTotal).toStringAsFixed(2)}% post rate',
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
 

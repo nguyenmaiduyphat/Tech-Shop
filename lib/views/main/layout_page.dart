@@ -15,6 +15,7 @@ import 'package:tech_fun/views/bottom_view/post_page.dart';
 import 'package:tech_fun/views/main/inform_page.dart';
 import 'package:tech_fun/views/mid/event_page.dart';
 import 'package:tech_fun/views/mid/news_page.dart';
+import 'package:tech_fun/views/mid/order_page.dart';
 import 'package:tech_fun/views/mid/product_tech_page.dart';
 import 'package:tech_fun/views/mid/profile_page.dart';
 
@@ -278,6 +279,13 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
+              }),
+              DrawerMenuItem("My Orders", () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => OrderPage()),
                 );
               }),
               // Search Input

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/models/review_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
@@ -169,75 +170,92 @@ class _ReviewPageState extends State<ReviewPage> {
                               PointerDeviceKind.mouse,
                             },
                           ),
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: reviews.length,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: BorderSide(
-                                    color: _getBorderColor(reviews[index].rate),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                elevation: 2,
-                                color: Colors.white.withOpacity(0.95),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Avatar
-                                      CircleAvatar(
-                                        backgroundImage: AssetImage(
-                                          reviews[index].avatar,
+                          child: AnimationLimiter(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.all(16),
+                              itemCount: reviews.length,
+                              itemBuilder: (context, index) {
+                                return AnimationConfiguration.staggeredList(
+                                  position: index,
+                                  duration: const Duration(milliseconds: 600),
+                                  child: SlideAnimation(
+                                    verticalOffset: 50.0,
+                                    child: FadeInAnimation(
+                                      child: Card(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 12,
                                         ),
-                                        radius: 24,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      // Review content
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // User name and rating stars
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  reviews[index].user,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
-                                                  ),
-                                                ),
-                                                _buildStarRating(
-                                                  reviews[index].rate,
-                                                ),
-                                              ],
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          side: BorderSide(
+                                            color: _getBorderColor(
+                                              reviews[index].rate,
                                             ),
-                                            const SizedBox(height: 8),
-                                            // Review text
-                                            Text(
-                                              reviews[index].content,
-                                              style: const TextStyle(
-                                                fontSize: 15,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                        elevation: 2,
+                                        color: Colors.white.withOpacity(0.95),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: AssetImage(
+                                                  reviews[index].avatar,
+                                                ),
+                                                radius: 24,
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          reviews[index].user,
+                                                          style:
+                                                              const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 15,
+                                                              ),
+                                                        ),
+                                                        _buildStarRating(
+                                                          reviews[index].rate,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      reviews[index].content,
+                                                      style: const TextStyle(
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),

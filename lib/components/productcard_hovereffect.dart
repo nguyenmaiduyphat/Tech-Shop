@@ -165,7 +165,7 @@ class _ProductCardHoverEffectState extends State<ProductCardHoverEffect> {
                           const Icon(Icons.star, color: Colors.amber, size: 16),
                           const SizedBox(width: 4),
                           Text(
-                            '${widget.product.rate.toString()}',
+                            '${widget.product.rate.toStringAsFixed(1)}',
                             style: TextStyle(
                               color: isHovered
                                   ? Colors.deepOrange

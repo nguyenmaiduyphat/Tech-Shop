@@ -765,19 +765,19 @@ class _ProductTechPageState extends State<ProductTechPage>
   }
 
   int _partition(List<ProductDetail> list, int low, int high) {
-    double pivot = list[high].price;
+    int pivot = list[high].price;
     int i = low - 1;
 
     for (int j = low; j < high; j++) {
       if (list[j].price < pivot) {
         i++;
-        double temp = list[i].price;
+        int temp = list[i].price;
         list[i].price = list[j].price;
         list[j].price = temp;
       }
     }
 
-    double temp = list[i + 1].price;
+    int temp = list[i + 1].price;
     list[i + 1].price = list[high].price;
     list[high].price = temp;
 
@@ -793,20 +793,20 @@ class _ProductTechPageState extends State<ProductTechPage>
   }
 
   int _partitionDescending(List<ProductDetail> list, int low, int high) {
-    double pivot = list[high].price;
+    int pivot = list[high].price;
     int i = low - 1;
 
     for (int j = low; j < high; j++) {
       if (list[j].price > pivot) {
         // Change '<' to '>'
         i++;
-        double temp = list[i].price;
+        int temp = list[i].price;
         list[i].price = list[j].price;
         list[j].price = temp;
       }
     }
 
-    double temp = list[i + 1].price;
+    int temp = list[i + 1].price;
     list[i + 1].price = list[high].price;
     list[high].price = temp;
 
