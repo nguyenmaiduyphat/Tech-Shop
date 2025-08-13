@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/utils/formatcurrency.dart';
+import 'package:tech_fun/utils/secure_storage_service.dart';
+import 'package:tech_fun/views/main/layout_page.dart';
 
 class CartPage extends StatefulWidget {
-  late Map<ProductDetail, int> itemList;
-
-  CartPage({super.key, required this.itemList});
+  const CartPage({super.key});
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -13,7 +13,7 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   int get total {
-    return widget.itemList.entries.fold(
+    return SecureStorageService.itemList.entries.fold(
       0,
       (sum, item) => sum + (item.key.price * item.value),
     );
@@ -32,6 +32,15 @@ class _CartPageState extends State<CartPage> {
             letterSpacing: 1.2,
           ),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LayoutPage()),
+            );
+          },
+        ),
         backgroundColor: const Color(0xFF1E293B),
         centerTitle: true,
         elevation: 2,
@@ -41,9 +50,11 @@ class _CartPageState extends State<CartPage> {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: widget.itemList.entries.length,
+              itemCount: SecureStorageService.itemList.entries.length,
               itemBuilder: (context, index) {
-                final item = widget.itemList.entries.elementAt(index);
+                final item = SecureStorageService.itemList.entries.elementAt(
+                  index,
+                );
                 return Card(
                   color: const Color(0xFF1E293B),
                   shape: RoundedRectangleBorder(
@@ -94,8 +105,10 @@ class _CartPageState extends State<CartPage> {
                               onPressed: () {
                                 setState(() {
                                   if (item.value > 1) {
-                                    widget.itemList[item.key] =
-                                        widget.itemList[item.key]! - 1;
+                                    SecureStorageService.itemList[item.key] =
+                                        SecureStorageService.itemList[item
+                                            .key]! -
+                                        1;
                                   }
                                 });
                               },
@@ -111,8 +124,9 @@ class _CartPageState extends State<CartPage> {
                             IconButton(
                               onPressed: () {
                                 setState(() {
-                                  widget.itemList[item.key] =
-                                      widget.itemList[item.key]! + 1;
+                                  SecureStorageService.itemList[item.key] =
+                                      SecureStorageService.itemList[item.key]! +
+                                      1;
                                 });
                               },
                               icon: const Icon(Icons.add, color: Colors.white),

@@ -10,7 +10,9 @@ import 'package:tech_fun/models/review_detail.dart';
 import 'package:tech_fun/models/shop_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/utils/formatcurrency.dart';
+import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
+import 'package:tech_fun/views/mid/cart_page.dart';
 import 'package:tech_fun/views/mid/product_tech_page.dart';
 import 'package:tech_fun/views/mid/review_Page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -787,7 +789,19 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           SizedBox(
             width: 100, // Same fixed width as above
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  int amountOfProduct =
+                      SecureStorageService.itemList.containsKey(
+                        widget.productDetail,
+                      )
+                      ? SecureStorageService.itemList[widget.productDetail]!
+                      : 0;
+                  amountOfProduct++;
+                  SecureStorageService.itemList[widget.productDetail] =
+                      amountOfProduct;
+                });
+              },
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.white30),
                 foregroundColor: Colors.white,
@@ -802,7 +816,23 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           const SizedBox(width: 20),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  int amountOfProduct =
+                      SecureStorageService.itemList.containsKey(
+                        widget.productDetail,
+                      )
+                      ? SecureStorageService.itemList[widget.productDetail]!
+                      : 0;
+                  amountOfProduct++;
+                  SecureStorageService.itemList[widget.productDetail] =
+                      amountOfProduct;
+                });
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => CartPage()),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyanAccent,
                 foregroundColor: Colors.black,

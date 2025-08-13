@@ -22,7 +22,12 @@ Future<void> main() async {
   await SecureStorageService.init();
   //await addData();
 
+  // final productList = await FirebaseCloundService.getAllProducts();
 
+  // final List<OrderDetail> myOrders = generateOrders(productList);
+  // for (var x in myOrders) {
+  //   await FirebaseCloundService.addOrder(x);
+  // }
   runApp(const MyApp());
 }
 

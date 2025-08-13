@@ -13,6 +13,7 @@ import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
 import 'package:tech_fun/views/bottom_view/my_store_page.dart';
 import 'package:tech_fun/views/bottom_view/post_page.dart';
 import 'package:tech_fun/views/main/inform_page.dart';
+import 'package:tech_fun/views/mid/cart_page.dart';
 import 'package:tech_fun/views/mid/event_page.dart';
 import 'package:tech_fun/views/mid/news_page.dart';
 import 'package:tech_fun/views/mid/order_page.dart';
@@ -139,6 +140,19 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
 
                       // Centered logo or search
                       Expanded(child: Center(child: _LogoText())),
+                      SizedBox(width: 8),
+                      IconButton(
+                        icon: Icon(
+                          Icons.shopping_cart_checkout_sharp,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => CartPage()),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),

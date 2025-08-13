@@ -1,10 +1,12 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/models/user_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
 
 class SecureStorageService {
   // Singleton để dùng toàn cục
   static final FlutterSecureStorage _storage = FlutterSecureStorage();
+  static Map<ProductDetail, int> itemList = {};
 
   static final String keyName = 'email';
   static final String offlineStatus = 'Guest';

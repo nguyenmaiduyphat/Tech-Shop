@@ -4,7 +4,7 @@ enum StatusOrder { None, Processing, Shipped, Delivered }
 
 class OrderDetail {
   final String user;
-  final List<ProductDetail> items;
+  final Map<ProductDetail, int> items;
   final double discount;
   final int total;
   final String id;
@@ -24,21 +24,30 @@ class OrderDetail {
   Map<String, dynamic> toMap() {
     return {
       'user': user,
-      'items': items.map((item) => item.toMap()).toList(),
+      'items': items.entries.map((entry) {
+        return {'product': entry.key.toMap(), 'quantity': entry.value};
+      }).toList(),
       'discount': discount,
       'total': total,
       'id': id,
       'dateCreated': dateCreated,
-      'status': status.name, // convert enum to string
+      'status': status.name,
     };
   }
 
   factory OrderDetail.fromMap(Map<String, dynamic> map) {
+    final Map<ProductDetail, int> parsedItems = {};
+
+    for (var item in (map['items'] as List<dynamic>)) {
+      final productMap = Map<String, dynamic>.from(item['product']);
+      final product = ProductDetail.fromMap(productMap);
+      final quantity = item['quantity'] ?? 0;
+      parsedItems[product] = quantity;
+    }
+
     return OrderDetail(
       user: map['user'] ?? '',
-      items: (map['items'] as List<dynamic>)
-          .map((item) => ProductDetail.fromMap(Map<String, dynamic>.from(item)))
-          .toList(),
+      items: parsedItems,
       total: map['total'] ?? 0,
       discount: (map['discount'] ?? 0).toDouble(),
       id: map['id'] ?? '',

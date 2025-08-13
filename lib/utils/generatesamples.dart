@@ -222,49 +222,51 @@ List<ShopDetail> generateShops() => List.generate(sampleShops.length, (i) {
   );
 });
 
-List<OrderDetail> generateOrders(
-  List<ProductDetail> productList,
-) => List.generate(50, (i) {
-  final total = productList.fold(
-    0,
-    (sum, entry) => sum + entry.price * random.nextInt(50),
-  );
-  final discount = (random.nextDouble() * 66).toStringAsFixed(
-    1,
-  ); // 0.0 to 66.0%
-  int statusIndex = random.nextInt(3);
-  StatusOrder statusOrder = StatusOrder.None;
+List<OrderDetail> generateOrders(List<ProductDetail> productList) {
+  return List.generate(50, (i) {
+    // Generate a random subset of products
+    final selectedProducts = productList.toList()..shuffle();
+    final itemCount = random.nextInt(productList.length) + 1;
 
-  switch (statusOrder) {
-    case StatusOrder.Processing:
-      statusOrder = StatusOrder.Processing;
-      break;
-    case StatusOrder.Shipped:
-      statusOrder = StatusOrder.Shipped;
-      break;
-    case StatusOrder.Delivered:
-      statusOrder = StatusOrder.Delivered;
-      break;
-    case StatusOrder.None:
-      statusOrder = StatusOrder.None;
-      break;
-  }
+    final Map<ProductDetail, int> itemMap = {};
 
-  return OrderDetail(
-    user: 'user$i@gmail.com',
-    items: productList.take(random.nextInt(productList.length)).toList(),
-    total: total,
-    discount: double.parse(discount),
-    id: SecureStorageService.currentUser == SecureStorageService.offlineStatus
-        ? generateOrderCode()
-        : SecureStorageService.currentUser,
-    dateCreated: DateTime.now()
-        .subtract(Duration(days: random.nextInt(365)))
-        .year
-        .toString(),
-    status: statusOrder,
-  );
-});
+    for (var j = 0; j < itemCount; j++) {
+      final product = selectedProducts[j];
+      final quantity = random.nextInt(5) + 1; // 1 to 5
+      itemMap[product] = quantity;
+    }
+
+    // Calculate total
+    final total = itemMap.entries.fold<double>(
+      0,
+      (sum, entry) => sum + entry.key.price * entry.value,
+    );
+
+    // Generate random discount (0.0 to 66.0)
+    final discount = double.parse(
+      (random.nextDouble() * 66).toStringAsFixed(1),
+    );
+
+    // Random status
+    final statusIndex = random.nextInt(3); // 0, 1, or 2
+    final statusOrder =
+        StatusOrder.values[statusIndex + 1]; // Skip StatusOrder.None
+
+    return OrderDetail(
+      user: 'user$i@gmail.com',
+      items: itemMap,
+      total: total.toInt(),
+      discount: discount,
+      id: SecureStorageService.currentUser == SecureStorageService.offlineStatus
+          ? generateOrderCode()
+          : SecureStorageService.currentUser,
+      dateCreated: DateTime.now()
+          .subtract(Duration(days: random.nextInt(365)))
+          .toIso8601String(),
+      status: statusOrder,
+    );
+  });
+}
 
 List<NewsDetail> generateNews() => List.generate(50, (i) {
   return NewsDetail(
