@@ -15,6 +15,7 @@ import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/utils/generatesamples.dart';
 import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
+import 'package:tech_fun/views/mid/map_locate_delivery.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,7 +97,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         useMaterial3: true, // Optional for modern styling
       ),
-      home: LayoutPage(),
+      home: MapLocateDelivery(startPoint: '', endPoint: ''),
       debugShowCheckedModeBanner: false,
     );
   }
