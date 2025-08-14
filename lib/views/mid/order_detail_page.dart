@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tech_fun/models/order_detail.dart';
 import 'package:tech_fun/utils/formatcurrency.dart';
-import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/order_page.dart';
 
 class OrderDetailPage extends StatefulWidget {

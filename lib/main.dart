@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tech_fun/firebase_options.dart';
 import 'package:tech_fun/models/comment_detail.dart';
 import 'package:tech_fun/models/event_detail.dart';
@@ -43,8 +44,8 @@ Future<void> addData() async {
     await FirebaseCloundService.addComment(comment);
   }
 
-  final List<CommentDetail> myComments_news = generateSampleComments_News(50);
-  for (var comment in myComments_news) {
+  final List<CommentDetail> mycommentsNews = generateSampleComments_News(50);
+  for (var comment in mycommentsNews) {
     await FirebaseCloundService.addComment(comment);
   }
 
@@ -97,7 +98,10 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         useMaterial3: true, // Optional for modern styling
       ),
-      home: MapLocateDelivery(startPoint: '', endPoint: ''),
+      home: MapLocateDelivery(
+        startPoint: 'Times Square, New York, NY',
+        endPoint: 'Central Park, New York, NY',
+      ),
       debugShowCheckedModeBanner: false,
     );
   }

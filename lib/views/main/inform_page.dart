@@ -9,7 +9,7 @@ import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
 class InformPage extends StatefulWidget {
-  InformPage({super.key});
+  const InformPage({super.key});
 
   @override
   State<InformPage> createState() => _InformPageState();

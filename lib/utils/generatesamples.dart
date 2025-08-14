@@ -9,7 +9,6 @@ import 'package:tech_fun/models/event_detail.dart';
 import 'package:tech_fun/models/news_detail.dart';
 import 'package:tech_fun/models/order_detail.dart';
 import 'package:tech_fun/models/product_detail.dart';
-import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/utils/formatcurrency.dart';
 import 'package:tech_fun/utils/secure_storage_service.dart';
 

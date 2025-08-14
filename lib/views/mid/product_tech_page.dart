@@ -547,9 +547,9 @@ class _ProductTechPageState extends State<ProductTechPage>
             case ConnectionState.waiting:
               return Text('Loading....');
             default:
-              if (asyncSnapshot.hasError)
+              if (asyncSnapshot.hasError) {
                 return Text('Error: ${asyncSnapshot.error}');
-              else {
+              } else {
                 return AnimatedBuilder(
                   animation: _bgController,
                   builder: (context, child) {

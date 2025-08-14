@@ -307,7 +307,7 @@ class FirebaseRealtimeService {
   }
 
   Stream<DatabaseEvent> readUsers() {
-    return dbRef.child("${NameTable.USERS.name}").onValue;
+    return dbRef.child(NameTable.USERS.name).onValue;
   }
 
   Future<void> updateUser(String email, Map<String, dynamic> updates) async {

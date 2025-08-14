@@ -52,9 +52,9 @@ class _PostPageState extends State<PostPage> {
           case ConnectionState.waiting:
             return Text('Loading....');
           default:
-            if (asyncSnapshot.hasError)
+            if (asyncSnapshot.hasError) {
               return Text('Error: ${asyncSnapshot.error}');
-            else {
+            } else {
               return ScrollConfiguration(
                 behavior: const MaterialScrollBehavior().copyWith(
                   dragDevices: {

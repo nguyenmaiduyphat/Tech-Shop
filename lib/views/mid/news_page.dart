@@ -76,9 +76,9 @@ class _NewsPageState extends State<NewsPage>
           case ConnectionState.waiting:
             return Text('Loading....');
           default:
-            if (asyncSnapshot.hasError)
+            if (asyncSnapshot.hasError) {
               return Text('Error: ${asyncSnapshot.error}');
-            else {
+            } else {
               return AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {

@@ -6,7 +6,6 @@ import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/models/review_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/utils/secure_storage_service.dart';
-import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/product_detail_page.dart';
 
 class ReviewPage extends StatefulWidget {

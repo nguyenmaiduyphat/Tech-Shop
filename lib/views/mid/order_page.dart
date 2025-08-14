@@ -84,9 +84,9 @@ class _OrderPageState extends State<OrderPage> {
             case ConnectionState.waiting:
               return Text('Loading....');
             default:
-              if (asyncSnapshot.hasError)
+              if (asyncSnapshot.hasError) {
                 return Text('Error: ${asyncSnapshot.error}');
-              else {
+              } else {
                 if (orders.isEmpty) {
                   return Center(
                     child: Column(

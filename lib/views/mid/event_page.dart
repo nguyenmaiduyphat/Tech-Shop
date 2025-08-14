@@ -82,9 +82,9 @@ class _EventPageState extends State<EventPage>
                 case ConnectionState.waiting:
                   return Text('Loading....');
                 default:
-                  if (asyncSnapshot.hasError)
+                  if (asyncSnapshot.hasError) {
                     return Text('Error: ${asyncSnapshot.error}');
-                  else {
+                  } else {
                     return SafeArea(
                       child: Container(
                         decoration: BoxDecoration(

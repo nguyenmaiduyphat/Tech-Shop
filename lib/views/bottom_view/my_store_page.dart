@@ -85,9 +85,9 @@ class _MyStorePageState extends State<MyStorePage> {
           case ConnectionState.waiting:
             return Text('Loading....');
           default:
-            if (asyncSnapshot.hasError)
+            if (asyncSnapshot.hasError) {
               return Text('Error: ${asyncSnapshot.error}');
-            else {
+            } else {
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ScrollConfiguration(
