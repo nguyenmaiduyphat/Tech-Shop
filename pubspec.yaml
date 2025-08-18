@@ -60,6 +60,7 @@ dependencies:
   geocoding: ^4.0.0
   google_maps_widget: ^1.0.6
   http: ^1.5.0
+  zo_animated_border: ^1.0.0
 
 dev_dependencies:
   flutter_test:

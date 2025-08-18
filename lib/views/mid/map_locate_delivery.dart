@@ -22,10 +22,7 @@ class MapLocateDeliveryState extends State<MapLocateDelivery> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  CameraPosition? _kGooglePlex;
 
   static const CameraPosition _kLake = CameraPosition(
     bearing: 192.8334901395799,
@@ -34,14 +31,40 @@ class MapLocateDeliveryState extends State<MapLocateDelivery> {
     zoom: 19.151926040649414,
   );
 
-  final LatLng _startLatLng = const LatLng(
-    37.42796133580664,
-    -122.085749655962,
-  );
-  final LatLng _endLatLng = const LatLng(
-    37.43296265331129,
-    -122.08832357078792,
-  );
+  LatLng? _startLatLng;
+  LatLng? _endLatLng;
+
+  Future<LatLng?> _getLatLngFromAddress(String address) async {
+    const apiKey = 'AIzaSyBPeRH6NQArkUATfGeUVJPaxDldLY3Mb9s';
+    final url =
+        'https://maps.googleapis.com/maps/api/geocode/json?address=${Uri.encodeComponent(address)}&key=$apiKey';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['status'] == 'OK' && data['results'].isNotEmpty) {
+        final location = data['results'][0]['geometry']['location'];
+        return LatLng(location['lat'], location['lng']);
+      }
+    }
+    return null;
+  }
+
+  late Future<void> _loadDataFuture;
+
+  Future<void> _initMapData() async {
+    _startLatLng = await _getLatLngFromAddress(widget.startPoint);
+    _endLatLng = await _getLatLngFromAddress(widget.endPoint);
+
+    if (_startLatLng != null && _endLatLng != null) {
+      setState(() {
+        _kGooglePlex = CameraPosition(target: _startLatLng!, zoom: 14.4746);
+        _setMapElements();
+      });
+      await _getRoute();
+    }
+  }
 
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = Set<Polyline>(); // Constructor form
@@ -49,21 +72,20 @@ class MapLocateDeliveryState extends State<MapLocateDelivery> {
   @override
   void initState() {
     super.initState();
-    _setMapElements();
-    _getRoute();
+    _loadDataFuture = _initMapData();
   }
 
   void _setMapElements() {
     _markers = {
       Marker(
         markerId: const MarkerId('start'),
-        position: _startLatLng,
+        position: _startLatLng!,
         infoWindow: InfoWindow(title: widget.startPoint),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       ),
       Marker(
         markerId: const MarkerId('end'),
-        position: _endLatLng,
+        position: _endLatLng!,
         infoWindow: InfoWindow(title: widget.endPoint),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       ),
@@ -73,7 +95,7 @@ class MapLocateDeliveryState extends State<MapLocateDelivery> {
   Future<void> _getRoute() async {
     const apiKey = 'AIzaSyBPeRH6NQArkUATfGeUVJPaxDldLY3Mb9s';
     final url =
-        'https://maps.googleapis.com/maps/api/directions/json?origin=${_startLatLng.latitude},${_startLatLng.longitude}&destination=${_endLatLng.latitude},${_endLatLng.longitude}&mode=driving&key=$apiKey';
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${_startLatLng!.latitude},${_startLatLng!.longitude}&destination=${_endLatLng!.latitude},${_endLatLng!.longitude}&mode=driving&key=$apiKey';
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -88,7 +110,7 @@ class MapLocateDeliveryState extends State<MapLocateDelivery> {
             Polyline(
               polylineId: const PolylineId('route'),
               points: decodedPoints,
-              color: Colors.blue,
+              color: Colors.blueAccent,
               width: 5,
             ),
           );
@@ -130,43 +152,34 @@ class MapLocateDeliveryState extends State<MapLocateDelivery> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
-        markers: _markers,
-        polylines: _polylines,
-        mapType: MapType.hybrid,
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
+      body: FutureBuilder(
+        future: _loadDataFuture,
+        builder: (context, asyncSnapshot) {
+          switch (asyncSnapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Text('Loading....');
+            default:
+              if (_kGooglePlex == null) {
+                return const Center(
+                  child: Text('Không thể tải bản đồ - Tọa độ không hợp lệ'),
+                );
+              }
+              if (asyncSnapshot.hasError) {
+                return Text('Error: ${asyncSnapshot.error}');
+              } else {
+                return GoogleMap(
+                  markers: _markers,
+                  polylines: _polylines,
+                  mapType: MapType.hybrid,
+                  initialCameraPosition: _kGooglePlex!,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                );
+              }
+          }
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: const Text('To the lake!'),
-        icon: const Icon(Icons.directions_boat),
-      ),
     );
-  }
-
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    LatLngBounds bounds = LatLngBounds(
-      southwest: LatLng(
-        _startLatLng.latitude < _endLatLng.latitude
-            ? _startLatLng.latitude
-            : _endLatLng.latitude,
-        _startLatLng.longitude < _endLatLng.longitude
-            ? _startLatLng.longitude
-            : _endLatLng.longitude,
-      ),
-      northeast: LatLng(
-        _startLatLng.latitude > _endLatLng.latitude
-            ? _startLatLng.latitude
-            : _endLatLng.latitude,
-        _startLatLng.longitude > _endLatLng.longitude
-            ? _startLatLng.longitude
-            : _endLatLng.longitude,
-      ),
-    );
-    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
   }
 }

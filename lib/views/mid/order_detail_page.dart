@@ -1,9 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:intl/intl.dart';
 import 'package:tech_fun/models/order_detail.dart';
 import 'package:tech_fun/utils/formatcurrency.dart';
 import 'package:tech_fun/views/mid/order_page.dart';
+import 'package:tech_fun/views/mid/order_tracking_page.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final OrderDetail order;
@@ -179,43 +181,58 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                                   PointerDeviceKind.mouse,
                                 },
                               ),
-                              child: ListView.builder(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                itemCount: order.items.length,
-                                itemBuilder: (context, index) {
-                                  final entry = order.items.entries.elementAt(
-                                    index,
-                                  );
-                                  final product = entry.key;
-                                  final quantity = entry.value;
+                              child: AnimationLimiter(
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  itemCount: order.items.length,
+                                  itemBuilder: (context, index) {
+                                    final entry = order.items.entries.elementAt(
+                                      index,
+                                    );
+                                    final product = entry.key;
+                                    final quantity = entry.value;
 
-                                  return ListTile(
-                                    leading: const Icon(
-                                      Icons.memory,
-                                      color: Colors.white38,
-                                    ),
-                                    title: Text(
-                                      product.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                    return AnimationConfiguration.staggeredList(
+                                      position: index,
+                                      duration: const Duration(
+                                        milliseconds: 375,
                                       ),
-                                    ),
-                                    subtitle: Text(
-                                      "Qty: $quantity",
-                                      style: const TextStyle(
-                                        color: Colors.white54,
+                                      child: SlideAnimation(
+                                        verticalOffset: 50.0,
+                                        child: FadeInAnimation(
+                                          child: ListTile(
+                                            leading: const Icon(
+                                              Icons.memory,
+                                              color: Colors.white38,
+                                            ),
+                                            title: Text(
+                                              product.name,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              "Qty: $quantity",
+                                              style: const TextStyle(
+                                                color: Colors.white54,
+                                              ),
+                                            ),
+                                            trailing: Text(
+                                              formatCurrency(
+                                                product.price * quantity,
+                                              ),
+                                              style: const TextStyle(
+                                                color: Colors.cyanAccent,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    trailing: Text(
-                                      formatCurrency(product.price * quantity),
-                                      style: const TextStyle(
-                                        color: Colors.cyanAccent,
-                                      ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -280,9 +297,11 @@ class _OrderDetailPageState extends State<OrderDetailPage>
                       height: 50,
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Tracking not yet implemented"),
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  OrderTrackingPage(order: widget.order),
                             ),
                           );
                         },

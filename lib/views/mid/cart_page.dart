@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:tech_fun/utils/formatcurrency.dart';
 import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
@@ -47,96 +48,117 @@ class _CartPageState extends State<CartPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: SecureStorageService.itemList.entries.length,
-              itemBuilder: (context, index) {
-                final item = SecureStorageService.itemList.entries.elementAt(
-                  index,
-                );
-                return Card(
-                  color: const Color(0xFF1E293B),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(
-                            item.key.images[0],
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
+            child: AnimationLimiter(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: SecureStorageService.itemList.entries.length,
+                itemBuilder: (context, index) {
+                  final item = SecureStorageService.itemList.entries.elementAt(
+                    index,
+                  );
+
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 375),
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: Card(
+                          color: const Color(0xFF1E293B),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.asset(
+                                    item.key.images[0],
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.key.name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        formatCurrency(item.key.price),
+                                        style: const TextStyle(
+                                          color: Colors.cyanAccent,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          if (item.value > 1) {
+                                            SecureStorageService.itemList[item
+                                                    .key] =
+                                                SecureStorageService
+                                                    .itemList[item.key]! -
+                                                1;
+                                          }
+                                        });
+                                      },
+                                      icon: const Icon(
+                                        Icons.remove,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      item.value.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          SecureStorageService.itemList[item
+                                                  .key] =
+                                              SecureStorageService.itemList[item
+                                                  .key]! +
+                                              1;
+                                        });
+                                      },
+                                      icon: const Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.key.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                formatCurrency(item.key.price),
-                                style: const TextStyle(
-                                  color: Colors.cyanAccent,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (item.value > 1) {
-                                    SecureStorageService.itemList[item.key] =
-                                        SecureStorageService.itemList[item
-                                            .key]! -
-                                        1;
-                                  }
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.remove,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              item.value.toString(),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  SecureStorageService.itemList[item.key] =
-                                      SecureStorageService.itemList[item.key]! +
-                                      1;
-                                });
-                              },
-                              icon: const Icon(Icons.add, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
           Container(

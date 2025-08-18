@@ -222,13 +222,21 @@ List<ShopDetail> generateShops() => List.generate(sampleShops.length, (i) {
 });
 
 List<OrderDetail> generateOrders(List<ProductDetail> productList) {
+  final allStations = [
+    "Warehouse - Ho Chi Minh City",
+    "Station 1 - Binh Duong",
+    "Station 2 - Dong Nai",
+    "Station 3 - Da Nang",
+    "Station 4 - Ha Noi",
+    "Final Destination - Customer Address",
+  ];
+
   return List.generate(50, (i) {
-    // Generate a random subset of products
+    // Random product selection
     final selectedProducts = productList.toList()..shuffle();
     final itemCount = random.nextInt(productList.length) + 1;
 
     final Map<ProductDetail, int> itemMap = {};
-
     for (var j = 0; j < itemCount; j++) {
       final product = selectedProducts[j];
       final quantity = random.nextInt(5) + 1; // 1 to 5
@@ -251,6 +259,15 @@ List<OrderDetail> generateOrders(List<ProductDetail> productList) {
     final statusOrder =
         StatusOrder.values[statusIndex + 1]; // Skip StatusOrder.None
 
+    // Decide number of stations: 3 or 5
+    final stationCount = random.nextBool() ? 3 : 5;
+
+    // Shuffle stations and pick
+    final shuffledStations = allStations.toList()..shuffle();
+    final selectedStations = shuffledStations
+        .take(stationCount)
+        .toList(growable: false);
+
     return OrderDetail(
       user: 'user$i@gmail.com',
       items: itemMap,
@@ -263,6 +280,7 @@ List<OrderDetail> generateOrders(List<ProductDetail> productList) {
           .subtract(Duration(days: random.nextInt(365)))
           .toIso8601String(),
       status: statusOrder,
+      address: selectedStations,
     );
   });
 }

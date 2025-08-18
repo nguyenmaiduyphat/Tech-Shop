@@ -10,6 +10,7 @@ class OrderDetail {
   final String id;
   final String dateCreated;
   final StatusOrder status;
+  final List<String> address;
 
   OrderDetail({
     required this.user,
@@ -19,6 +20,7 @@ class OrderDetail {
     required this.id,
     required this.dateCreated,
     required this.status,
+    required this.address,
   });
 
   Map<String, dynamic> toMap() {
@@ -32,6 +34,7 @@ class OrderDetail {
       'id': id,
       'dateCreated': dateCreated,
       'status': status.name,
+      'address': address,
     };
   }
 
@@ -56,6 +59,7 @@ class OrderDetail {
         (e) => e.name == (map['status'] ?? 'None'),
         orElse: () => StatusOrder.None,
       ),
+      address: List<String>.from(map['address'] ?? []),
     );
   }
 }
