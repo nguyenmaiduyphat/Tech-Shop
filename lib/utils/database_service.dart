@@ -294,65 +294,65 @@ class FirebaseCloundService {
 class FirebaseRealtimeService {
   static final dbRef = FirebaseDatabase.instance.ref();
 
+  /// ➕ Thêm comment
   static Future<void> addComment(CommentDetail comment) async {
     await dbRef
         .child("${NameTable.COMMENTS.name}/${comment.id}")
         .set(comment.toMap());
   }
 
-  Future<void> addUser(UserDetail user) async {
-    await dbRef
-        .child("${NameTable.USERS.name}/${user.email}")
-        .set(user.toMap());
+  /// 📖 Đọc toàn bộ comments (realtime stream)
+  Stream<DatabaseEvent> readComments() {
+    return dbRef.child(NameTable.COMMENTS.name).onValue;
   }
 
-  Stream<DatabaseEvent> readUsers() {
-    return dbRef.child(NameTable.USERS.name).onValue;
-  }
-
-  Future<void> updateUser(String email, Map<String, dynamic> updates) async {
+  /// 🔄 Update comment theo id
+  Future<void> updateComment(String id, Map<String, dynamic> updates) async {
     try {
       final snapshot = await dbRef
-          .child(NameTable.USERS.name)
-          .orderByChild('email')
-          .equalTo(email)
+          .child(NameTable.COMMENTS.name)
+          .orderByChild('id')
+          .equalTo(id)
           .once();
 
       if (snapshot.snapshot.value == null) {
-        print('No user found with email: $email');
+        print('No comment found with id: $id');
         return;
       }
 
       final data = Map<String, dynamic>.from(snapshot.snapshot.value as Map);
-      data.forEach((userId, userData) async {
-        await dbRef.child('${NameTable.USERS.name}/$userId').update(updates);
-        print('User $userId updated.');
+      data.forEach((commentId, _) async {
+        await dbRef
+            .child('${NameTable.COMMENTS.name}/$commentId')
+            .update(updates);
+        print('Comment $commentId updated.');
       });
     } catch (e) {
-      print('Error updating user: $e');
+      print('Error updating comment: $e');
     }
   }
 
-  Future<void> deleteUser(String email) async {
+  /// ❌ Xóa comment theo id
+  Future<void> deleteComment(String id) async {
     try {
       final snapshot = await dbRef
-          .child(NameTable.USERS.name)
-          .orderByChild('email')
-          .equalTo(email)
+          .child(NameTable.COMMENTS.name)
+          .orderByChild('id')
+          .equalTo(id)
           .once();
 
       if (snapshot.snapshot.value == null) {
-        print('No user found with email: $email');
+        print('No comment found with id: $id');
         return;
       }
 
       final data = Map<String, dynamic>.from(snapshot.snapshot.value as Map);
-      data.forEach((userId, userData) async {
-        await dbRef.child('${NameTable.USERS.name}/$userId').remove();
-        print('User $userId deleted.');
+      data.forEach((commentId, _) async {
+        await dbRef.child('${NameTable.COMMENTS.name}/$commentId').remove();
+        print('Comment $commentId deleted.');
       });
     } catch (e) {
-      print('Error deleting user: $e');
+      print('Error deleting comment: $e');
     }
   }
 }
