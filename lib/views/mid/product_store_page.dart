@@ -128,7 +128,6 @@ class _ProductStorePageState extends State<ProductStorePage> {
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      fontFamily: 'RobotoMono',
                       letterSpacing: 1.5,
                     ),
                   ),

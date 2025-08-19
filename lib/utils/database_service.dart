@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:tech_fun/models/chat_detail.dart';
 import 'package:tech_fun/models/comment_detail.dart';
 import 'package:tech_fun/models/event_detail.dart';
 import 'package:tech_fun/models/news_detail.dart';
@@ -22,6 +23,7 @@ enum NameTable {
   NEWS,
   COMMENTS,
   REVIEWS,
+  CHATS,
 }
 
 class FirebaseCloundService {
@@ -288,6 +290,22 @@ class FirebaseCloundService {
     if (snapshot.docs.isNotEmpty) {
       await snapshot.docs.first.reference.update(shop.toMap());
     }
+  }
+
+  /// CHATS
+  static Future<void> addChat(ChatDetail shop) async {
+    await _firestore.collection(NameTable.CHATS.name).add(shop.toMap());
+  }
+
+  static Future<List<ChatDetail>> getAllChatsWithIdShop({
+    required String id,
+  }) async {
+    QuerySnapshot<Map<String, dynamic>>? snapshot;
+    snapshot = await _firestore
+        .collection(NameTable.CHATS.name)
+        .where('id', isEqualTo: id)
+        .get();
+    return snapshot.docs.map((doc) => ChatDetail.fromMap(doc.data())).toList();
   }
 }
 
