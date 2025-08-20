@@ -782,7 +782,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   context,
                   MaterialPageRoute(
                     builder: (_) =>
-                        ShopChatListPage(shopName: widget.productDetail.shop),
+                        ShopChatListPage(product: widget.productDetail),
                   ),
                 );
               },
