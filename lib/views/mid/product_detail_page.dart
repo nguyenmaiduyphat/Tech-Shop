@@ -15,6 +15,7 @@ import 'package:tech_fun/views/main/layout_page.dart';
 import 'package:tech_fun/views/mid/cart_page.dart';
 import 'package:tech_fun/views/mid/product_tech_page.dart';
 import 'package:tech_fun/views/mid/review_Page.dart';
+import 'package:tech_fun/views/mid/shop_chat_list_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -776,7 +777,15 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           SizedBox(
             width: 100, // Fixed width for icon button
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        ShopChatListPage(shopName: widget.productDetail.shop),
+                  ),
+                );
+              },
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.white30),
                 foregroundColor: Colors.white,

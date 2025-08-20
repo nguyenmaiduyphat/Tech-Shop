@@ -12,6 +12,7 @@ import 'package:tech_fun/models/product_detail.dart';
 import 'package:tech_fun/models/review_detail.dart';
 import 'package:tech_fun/models/shop_detail.dart';
 import 'package:tech_fun/models/user_detail.dart';
+import 'package:tech_fun/views/bottom_view/community_chat_page.dart';
 
 enum NameTable {
   USERS,
@@ -24,6 +25,7 @@ enum NameTable {
   COMMENTS,
   REVIEWS,
   CHATS,
+  MESSAGES,
 }
 
 class FirebaseCloundService {
@@ -252,6 +254,12 @@ class FirebaseCloundService {
     await _firestore.collection(NameTable.STORE.name).add(shop.toMap());
   }
 
+  static Future<List<ShopDetail>> getShops() async {
+    final snapshot = await _firestore.collection(NameTable.STORE.name).get();
+
+    return snapshot.docs.map((doc) => ShopDetail.fromMap(doc.data())).toList();
+  }
+
   // ✅ Get shop by `id` field
   static Future<ShopDetail?> getShopById(String email) async {
     final snapshot = await _firestore
@@ -298,14 +306,27 @@ class FirebaseCloundService {
   }
 
   static Future<List<ChatDetail>> getAllChatsWithIdShop({
-    required String id,
+    required String idUser,
+    required String idShop,
   }) async {
     QuerySnapshot<Map<String, dynamic>>? snapshot;
     snapshot = await _firestore
         .collection(NameTable.CHATS.name)
-        .where('id', isEqualTo: id)
+        .where('idUser', isEqualTo: idUser)
+        .where('idShop', isEqualTo: idShop)
         .get();
     return snapshot.docs.map((doc) => ChatDetail.fromMap(doc.data())).toList();
+  }
+
+  /// MESSAGES
+  static Future<void> addMessage(ChatMessage chat) async {
+    await _firestore.collection(NameTable.MESSAGES.name).add(chat.toMap());
+  }
+
+  static Future<List<ChatMessage>> getAllMessages() async {
+    QuerySnapshot<Map<String, dynamic>>? snapshot;
+    snapshot = await _firestore.collection(NameTable.MESSAGES.name).orderBy('sentAt').get();
+    return snapshot.docs.map((doc) => ChatMessage.fromMap(doc.data())).toList();
   }
 }
 

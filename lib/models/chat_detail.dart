@@ -1,5 +1,6 @@
 class ChatDetail {
-  final String id;
+  final String idUser;
+  final String idShop;
   final String avatar;
   final String content;
   final String owner;
@@ -7,7 +8,8 @@ class ChatDetail {
   final List<String> images;
 
   ChatDetail({
-    required this.id,
+    required this.idUser,
+    required this.idShop,
     required this.avatar,
     required this.content,
     required this.owner,
@@ -16,7 +18,8 @@ class ChatDetail {
   });
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'idUser': idUser,
+      'idShop': idShop,
       'avatar': avatar,
       'content': content,
       'owner': owner,
@@ -27,7 +30,8 @@ class ChatDetail {
 
   factory ChatDetail.fromMap(Map<String, dynamic> map) {
     return ChatDetail(
-      id: map['id'] ?? '',
+      idUser: map['idUser'] ?? '',
+      idShop: map['idShop'] ?? '',
       avatar: map['avatar'] ?? '',
       content: map['content'] ?? '',
       owner: map['owner'] ?? '',

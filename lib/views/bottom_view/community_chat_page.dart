@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tech_fun/components/animated_chatmessage.dart';
+import 'package:tech_fun/utils/database_service.dart';
+import 'package:tech_fun/utils/secure_storage_service.dart';
 
 class ChatMessage {
   final String userId;
@@ -24,6 +26,30 @@ class ChatMessage {
     required this.image,
     required this.sentAt,
   });
+
+  // Convert ChatMessage to a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'userId': userId,
+      'userName': userName,
+      'userAvatarUrl': userAvatarUrl,
+      'text': text,
+      'image': image,
+      'sentAt': sentAt,
+    };
+  }
+
+  // Create ChatMessage from a Map
+  factory ChatMessage.fromMap(Map<String, dynamic> map) {
+    return ChatMessage(
+      userId: map['userId'] ?? '',
+      userName: map['userName'] ?? '',
+      userAvatarUrl: map['userAvatarUrl'] ?? '',
+      text: map['text'] ?? '',
+      image: map['image'] ?? '',
+      sentAt: map['sentAt'] ?? '',
+    );
+  }
 }
 
 class CommunityChatPage extends StatefulWidget {
@@ -35,62 +61,35 @@ class CommunityChatPage extends StatefulWidget {
 
 class _CommunityChatPageState extends State<CommunityChatPage>
     with SingleTickerProviderStateMixin {
-  final List<ChatMessage> messages = [
-    ChatMessage(
-      userId: "user_2",
-      userName: "Alice",
-      userAvatarUrl: "assets/user/user1.jpg",
-      text: "Hey there!",
-      image: "assets/product/product1.jpg",
-      sentAt: '21/07/2025 14:32:50',
-    ),
-    ChatMessage(
-      userId: "user_3",
-      userName: "Alice",
-      userAvatarUrl: "assets/user/user1.jpg",
-      text: "Hey there!",
-      image: "assets/product/product3.jpg",
-      sentAt: '19/06/2025 14:32:50',
-    ),
-    ChatMessage(
-      userId: "user_4",
-      userName: "Alice",
-      userAvatarUrl: "assets/user/user1.jpg",
-      text: "Hey there!",
-      image: "assets/product/product2.jpg",
-      sentAt: '19/06/2025 07:32:50',
-    ),
-    ChatMessage(
-      userId: "user_5",
-      userName: "Alice",
-      userAvatarUrl: "assets/user/user1.jpg",
-      text: "Hey there!",
-      image: "assets/product/product6.jpg",
-      sentAt: '16/06/2025 17:32:50',
-    ),
-  ];
+  List<ChatMessage> messages = [];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   final String currentUserId = "user_1"; // fake current user ID
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
+    if (SecureStorageService.user == null) return;
     final text = _controller.text.trim();
     if (text.isEmpty && _xfile == null) return;
 
     final newMessage = ChatMessage(
-      userId: currentUserId,
-      userName: "You",
+      userId: SecureStorageService.user!.email,
+      userName: SecureStorageService.user == null
+          ? 'Guest'
+          : SecureStorageService.user!.email,
       userAvatarUrl: "assets/user/user1.jpg",
       text: text,
       image: 'assets/product/image.png',
       sentAt: DateTime.now().toString().split('.')[0],
     );
+
+    await FirebaseCloundService.addMessage(newMessage);
     setState(() {
       messages.add(newMessage);
       _controller.clear();
       _xfile = null;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
     Future.delayed(const Duration(milliseconds: 100), () {
       _scrollController.animateTo(
@@ -241,118 +240,180 @@ class _CommunityChatPageState extends State<CommunityChatPage>
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadDataFuture = loadData();
+  }
+
+  late Future<void> _loadDataFuture;
+
+  Future<void> loadData() async {
+    messages = await FirebaseCloundService.getAllMessages();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      // or use animateTo for smooth scroll:
+      // _scrollController.animateTo(
+      //   _scrollController.position.maxScrollExtent,
+      //   duration: Duration(milliseconds: 300),
+      //   curve: Curves.easeOut,
+      // );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: 75 + bottomPadding),
-            child: ScrollConfiguration(
-              behavior: const MaterialScrollBehavior().copyWith(
-                dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
-              ),
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: messages.length,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                itemBuilder: (context, index) {
-                  final message = messages[index];
-                  final isMe = message.userId == currentUserId;
-                  return AnimatedChatMessage(message: message, isMe: isMe);
-                },
-              ),
-            ),
-          ),
-
-          // Input box
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 10,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_xfile != null)
-                  Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: buildSelectedImageWidget(),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _xfile = null;
-                              _imageBytes = null;
-                            });
+      body: FutureBuilder(
+        future: _loadDataFuture,
+        builder: (context, asyncSnapshot) {
+          switch (asyncSnapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Text('Loading....');
+            default:
+              if (asyncSnapshot.hasError) {
+                return Text('Error: ${asyncSnapshot.error}');
+              } else {
+                return Stack(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 75 + bottomPadding),
+                      child: ScrollConfiguration(
+                        behavior: const MaterialScrollBehavior().copyWith(
+                          dragDevices: {
+                            PointerDeviceKind.touch,
+                            PointerDeviceKind.mouse,
                           },
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
+                        ),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: messages.length,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          itemBuilder: (context, index) {
+                            final message = messages[index];
+                            final isMe = SecureStorageService.user != null
+                                ? message.userId ==
+                                      SecureStorageService.user!.email
+                                : false;
+                            return AnimatedChatMessage(
+                              message: message,
+                              isMe: isMe,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+
+                    // Input box
+                    Positioned(
+                      left: 16,
+                      right: 16,
+                      bottom: 10,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_xfile != null)
+                            Stack(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  child: buildSelectedImageWidget(),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _xfile = null;
+                                        _imageBytes = null;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            child: const Icon(
-                              Icons.close,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
                               color: Colors.white,
-                              size: 18,
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.image,
+                                    color: Colors.teal,
+                                  ),
+                                  onPressed: _pickImage,
+                                ),
+                                Expanded(
+                                  child: TextField(
+                                    cursorColor: const Color.fromARGB(
+                                      255,
+                                      14,
+                                      167,
+                                      134,
+                                    ),
+                                    controller: _controller,
+                                    decoration: const InputDecoration(
+                                      hintText: "Type a message...",
+                                      border: InputBorder.none,
+                                    ),
+                                    onSubmitted: (_) => _sendMessage(),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.send,
+                                    color: Colors.teal,
+                                  ),
+                                  onPressed: _sendMessage,
+                                ),
+                              ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.image, color: Colors.teal),
-                        onPressed: _pickImage,
-                      ),
-                      Expanded(
-                        child: TextField(
-                          cursorColor: const Color.fromARGB(255, 14, 167, 134),
-                          controller: _controller,
-                          decoration: const InputDecoration(
-                            hintText: "Type a message...",
-                            border: InputBorder.none,
-                          ),
-                          onSubmitted: (_) => _sendMessage(),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.send, color: Colors.teal),
-                        onPressed: _sendMessage,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+                    ),
+                  ],
+                );
+              }
+          }
+        },
       ),
     );
   }

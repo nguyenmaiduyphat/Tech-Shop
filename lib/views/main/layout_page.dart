@@ -19,6 +19,7 @@ import 'package:tech_fun/views/mid/news_page.dart';
 import 'package:tech_fun/views/mid/order_page.dart';
 import 'package:tech_fun/views/mid/product_tech_page.dart';
 import 'package:tech_fun/views/mid/profile_page.dart';
+import 'package:tech_fun/views/mid/shop_chat_list_page.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({super.key});
@@ -302,6 +303,7 @@ class _LayoutPageState extends State<LayoutPage> with TickerProviderStateMixin {
                   MaterialPageRoute(builder: (context) => OrderPage()),
                 );
               }),
+
               // Search Input
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
