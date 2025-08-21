@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tech_fun/models/product_detail.dart';
+import 'package:tech_fun/models/shop_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/utils/formatcurrency.dart';
 import 'package:tech_fun/views/mid/product_detail_page.dart';
@@ -14,6 +15,7 @@ class StorePage extends StatefulWidget {
 
 class _StorePageState extends State<StorePage> {
   List<ProductDetail> products = [];
+  ShopDetail? shop;
 
   String selectedCategory = "All";
   String selectedBrand = "All";
@@ -33,6 +35,9 @@ class _StorePageState extends State<StorePage> {
     products = await FirebaseCloundService.getAllProductsOfShop(
       widget.productDetail.shop,
     );
+    shop = await FirebaseCloundService.getShopByNameShop(
+      widget.productDetail.shop,
+    );
   }
 
   @override
@@ -44,12 +49,9 @@ class _StorePageState extends State<StorePage> {
         backgroundColor: Colors.blueAccent,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              "Tech World Store",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text("Owner: John Doe", style: TextStyle(fontSize: 14)),
+          children: [
+            Text(shop!.name, style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("Owner: ${shop!.user}", style: TextStyle(fontSize: 14)),
           ],
         ),
         leading: IconButton(
@@ -66,66 +68,87 @@ class _StorePageState extends State<StorePage> {
         ),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Search bar
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Search products...",
-                prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+      body: FutureBuilder(
+        future: _loadDataFuture,
+        builder: (context, asyncSnapshot) {
+          switch (asyncSnapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Text('Loading....');
+            default:
+              if (asyncSnapshot.hasError) {
+                return Text('Error: ${asyncSnapshot.error}');
+              } else {
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      // Search bar
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: "Search products...",
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: Colors.blueAccent,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
 
-            // Filter row
-            SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildFilterChip("Category", selectedCategory != "All"),
-                  _buildFilterChip("Price", selectedPrice < 2000),
-                  _buildFilterChip("Brand", selectedBrand != "All"),
-                  _buildFilterChip("Location", false),
-                  _buildFilterChip(
-                    "Rating ★${selectedRate.toStringAsFixed(1)}",
-                    selectedRate < 5,
+                      // Filter row
+                      SizedBox(
+                        height: 40,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            _buildFilterChip(
+                              "Category",
+                              selectedCategory != "All",
+                            ),
+                            _buildFilterChip("Price", selectedPrice < 2000),
+                            _buildFilterChip("Brand", selectedBrand != "All"),
+                            _buildFilterChip("Location", false),
+                            _buildFilterChip(
+                              "Rating ★${selectedRate.toStringAsFixed(1)}",
+                              selectedRate < 5,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Products grid
+                      Expanded(
+                        child: GridView.builder(
+                          itemCount: products.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 0.75,
+                              ),
+                          itemBuilder: (context, index) {
+                            final product = products[index];
+                            return _buildProductCard(product);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Products grid
-            Expanded(
-              child: GridView.builder(
-                itemCount: products.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.75,
-                ),
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return _buildProductCard(product);
-                },
-              ),
-            ),
-          ],
-        ),
+                );
+              }
+          }
+        },
       ),
     );
   }

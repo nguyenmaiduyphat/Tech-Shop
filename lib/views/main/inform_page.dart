@@ -1,10 +1,13 @@
 // ignore_for_file: non_constant_identifier_names, sized_box_for_whitespace, use_super_parameters, use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:tech_fun/models/user_detail.dart';
+import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/main/layout_page.dart';
 
@@ -154,6 +157,8 @@ class _InformPageState extends State<InformPage> {
     );
   }
 
+  final TextEditingController _usernamecontroller_forgot =
+      TextEditingController(text: '');
   Widget _buildForgotPasswordPage({Key? key}) {
     return Padding(
       key: key,
@@ -168,6 +173,7 @@ class _InformPageState extends State<InformPage> {
           ),
           const SizedBox(height: 20),
           TextField(
+            controller: _usernamecontroller_forgot,
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               labelText: 'Email',
@@ -199,8 +205,55 @@ class _InformPageState extends State<InformPage> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: () {
-                // Add reset logic here
+              onPressed: () async {
+                if (_usernamecontroller_forgot.text.contains('@gmail.com')) {
+                  if (_usernamecontroller_forgot.text.split("@")[1] !=
+                      "gmail.com") {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("After @ of email must be gmail.com"),
+                      ),
+                    );
+                    return;
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Your email must be email (@gmail.com)"),
+                    ),
+                  );
+                  return;
+                }
+
+                UserDetail? userDetail =
+                    await FirebaseCloundService.getUserByEmail(
+                      _usernamecontroller_forgot.text,
+                    );
+                if (userDetail == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Email wasn't existed")),
+                  );
+                  return;
+                } else {
+                  Random random = new Random();
+
+                  await FirebaseCloundService.updateUser(
+                    UserDetail(
+                      username: _usernamecontroller_forgot.text,
+                      password:
+                          'newpassword${random.nextInt(50)}${random.nextInt(50)}${random.nextInt(50)}',
+                      email: _usernamecontroller_forgot.text,
+                      phone: userDetail!.phone,
+                      address: userDetail.address,
+                      gender: userDetail.gender,
+                      birth: userDetail.birth,
+                      CIC: userDetail.CIC,
+                      bankNumber: userDetail.bankNumber,
+                    ),
+                  );
+
+                  _goToLogin();
+                }
               },
               child: const Text(
                 'Reset Password',
@@ -314,11 +367,20 @@ class _InformPageState extends State<InformPage> {
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Your email is not exist"),
+                            content: Text("Your infomation isn't correct!"),
                           ),
                         );
                         return;
                       } else {
+                        if (_passwordcontroller_login.text !=
+                            SecureStorageService.user!.password) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Your infomation isn't correct!"),
+                            ),
+                          );
+                          return;
+                        }
                         setState(() {
                           SecureStorageService.currentUser =
                               _usernamecontroller_login.text;
@@ -589,12 +651,38 @@ class _InformPageState extends State<InformPage> {
 
                       if (_passwordcontroller_register.text.trim() ==
                           _confirmpasswordcontroller_register.text.trim()) {
-                        await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
-                              email: _emailcontroller_register.text,
-                              password: _passwordcontroller_register.text,
+                        UserDetail? userDetail =
+                            await FirebaseCloundService.getUserByEmail(
+                              _emailcontroller_register.text,
                             );
-                        _goToLogin();
+                        if (userDetail == null) {
+                          await FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                                email: _emailcontroller_register.text,
+                                password: _passwordcontroller_register.text,
+                              );
+
+                          await FirebaseCloundService.addUser(
+                            UserDetail(
+                              username: _emailcontroller_register.text,
+                              password: _passwordcontroller_register.text,
+                              email: _emailcontroller_register.text,
+                              phone: _phonecontroller_register.text,
+                              address: _addresscontroller_register.text,
+                              gender: selectedGender!,
+                              birth: _birthcontroller_register.text,
+                              CIC: _ciccontroller_register.text,
+                              bankNumber: _bankcontroller_register.text,
+                            ),
+                          );
+
+                          _goToLogin();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Email was existed")),
+                          );
+                          return;
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
