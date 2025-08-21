@@ -126,6 +126,16 @@ class FirebaseCloundService {
         .toList();
   }
 
+  static Future<List<ProductDetail>> getAllProductsOfShop(String name) async {
+    final snapshot = await _firestore
+        .collection(NameTable.PRODUCTS.name)
+        .where('shop', isEqualTo: name)
+        .get();
+    return snapshot.docs
+        .map((doc) => ProductDetail.fromMap(doc.data()))
+        .toList();
+  }
+
   static Future<ProductDetail?> getProductById(String id) async {
     final doc = await _firestore
         .collection(NameTable.PRODUCTS.name)
@@ -325,7 +335,10 @@ class FirebaseCloundService {
 
   static Future<List<ChatMessage>> getAllMessages() async {
     QuerySnapshot<Map<String, dynamic>>? snapshot;
-    snapshot = await _firestore.collection(NameTable.MESSAGES.name).orderBy('sentAt').get();
+    snapshot = await _firestore
+        .collection(NameTable.MESSAGES.name)
+        .orderBy('sentAt')
+        .get();
     return snapshot.docs.map((doc) => ChatMessage.fromMap(doc.data())).toList();
   }
 }

@@ -5,6 +5,7 @@ import 'package:tech_fun/models/shop_detail.dart';
 import 'package:tech_fun/utils/database_service.dart';
 import 'package:tech_fun/utils/secure_storage_service.dart';
 import 'package:tech_fun/views/mid/product_detail_page.dart';
+import 'package:ikchatbot/ikchatbot.dart';
 
 class ShopChatListPage extends StatefulWidget {
   final ProductDetail product;
@@ -30,7 +31,9 @@ class _ShopChatListState extends State<ShopChatListPage> {
       idShop: shopDetail!.name,
       avatar: "assets/user/user1.jpg", // assuming sender avatar
       content: messageText,
-      owner: "me",
+      owner: SecureStorageService.user!.email == shopDetail!.user
+          ? "owner"
+          : "me",
       date: DateTime.now().toIso8601String(),
       images: [],
     );
